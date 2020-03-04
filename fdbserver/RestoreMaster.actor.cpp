@@ -57,27 +57,37 @@ ACTOR static Future<Void> notifyApplierToApplyMutations(Reference<MasterBatchDat
                                                         Reference<MasterBatchStatus> batchStatus,
                                                         std::map<UID, RestoreApplierInterface> appliersInterf,
                                                         int batchIndex, NotifiedVersion* finishedBatch);
+ACTOR static Future<Void> notifyLoadersVersionBatchFinished(std::map<UID, RestoreLoaderInterface> loadersInterf,
+                                                            int batchIndex);
 ACTOR static Future<Void> notifyRestoreCompleted(Reference<RestoreMasterData> self, bool terminate);
 ACTOR static Future<Void> signalRestoreCompleted(Reference<RestoreMasterData> self, Database cx);
+ACTOR static Future<Void> updateHeartbeatTime(Reference<RestoreMasterData> self);
+ACTOR static Future<Void> checkRolesLiveness(Reference<RestoreMasterData> self);
 
 void splitKeyRangeForAppliers(Reference<MasterBatchData> batchData,
                               std::map<UID, RestoreApplierInterface> appliersInterf, int batchIndex);
 
 ACTOR Future<Void> startRestoreMaster(Reference<RestoreWorkerData> masterWorker, Database cx) {
 	state Reference<RestoreMasterData> self = Reference<RestoreMasterData>(new RestoreMasterData());
+	state ActorCollectionNoErrors actors;
 
 	try {
 		// recruitRestoreRoles must come after masterWorker has finished collectWorkerInterface
 		wait(recruitRestoreRoles(masterWorker, self));
 
+		actors.add(updateHeartbeatTime(self));
+		actors.add(checkRolesLiveness(self));
+
 		wait(distributeRestoreSysInfo(masterWorker, self));
 
 		wait(startProcessRestoreRequests(self, cx));
 	} catch (Error& e) {
-		TraceEvent(SevError, "FastRestore")
-		    .detail("StartRestoreMaster", "Unexpectedly unhandled error")
-		    .detail("Error", e.what())
-		    .detail("ErrorCode", e.code());
+		if (e.code() != error_code_operation_cancelled) {
+			TraceEvent(SevError, "FastRestoreMasterStart")
+			    .detail("Reason", "Unexpected unhandled error")
+			    .detail("ErrorCode", e.code())
+			    .detail("Error", e.what());
+		}
 	}
 
 	return Void();
@@ -229,8 +239,17 @@ ACTOR Future<Void> startProcessRestoreRequests(Reference<RestoreMasterData> self
 	try {
 		wait(unlockDatabase(cx, randomUID));
 	} catch (Error& e) {
-		TraceEvent(SevError, "FastRestoreMasterUnlockDBFailed", self->id()).detail("UID", randomUID.toString());
-		ASSERT_WE_THINK(false); // This unlockDatabase should always succeed, we think.
+		if (e.code() == error_code_operation_cancelled) { // Should only happen in simulation
+			TraceEvent(SevWarnAlways, "FastRestoreMasterOnCancelingActor", self->id())
+			    .detail("DBLock", randomUID)
+			    .detail("ManualCheck", "Is DB locked");
+		} else {
+			TraceEvent(SevError, "FastRestoreMasterUnlockDBFailed", self->id())
+			    .detail("DBLock", randomUID)
+			    .detail("ErrorCode", e.code())
+			    .detail("Error", e.what());
+			ASSERT_WE_THINK(false); // This unlockDatabase should always succeed, we think.
+		}
 	}
 
 	TraceEvent("FastRestoreMasterRestoreCompleted", self->id());
@@ -514,6 +533,9 @@ ACTOR static Future<Void> distributeWorkloadPerVersionBatch(Reference<RestoreMas
 
 	self->runningVersionBatches.set(self->runningVersionBatches.get() + 1);
 
+	// In case sampling data takes too much memory on master
+	wait(isSchedulable(self, batchIndex, __FUNCTION__));
+
 	wait(initializeVersionBatch(self->appliersInterf, self->loadersInterf, batchIndex));
 
 	ASSERT(!versionBatch.isEmpty());
@@ -540,9 +562,17 @@ ACTOR static Future<Void> distributeWorkloadPerVersionBatch(Reference<RestoreMas
 	wait(sendMutationsFromLoaders(batchData, batchStatus, self->loadersInterf, batchIndex, false));
 	wait(sendMutationsFromLoaders(batchData, batchStatus, self->loadersInterf, batchIndex, true));
 
+	// Synchronization point for version batch pipelining.
+	// self->finishedBatch will continuously increase by 1 per version batch.
 	wait(notifyApplierToApplyMutations(batchData, batchStatus, self->appliersInterf, batchIndex, &self->finishedBatch));
 
+	wait(notifyLoadersVersionBatchFinished(self->loadersInterf, batchIndex));
+
 	self->runningVersionBatches.set(self->runningVersionBatches.get() - 1);
+
+	if (self->delayedActors > 0) {
+		self->checkMemory.trigger();
+	}
 	return Void();
 }
 
@@ -746,7 +776,7 @@ ACTOR static Future<Void> notifyApplierToApplyMutations(Reference<MasterBatchDat
                                                         int batchIndex, NotifiedVersion* finishedBatch) {
 
 	wait(finishedBatch->whenAtLeast(batchIndex - 1));
-	TraceEvent("FastRestoreMasterPhaseApplyToDBStart")
+	TraceEvent("FastRestoreMasterPhaseApplyToDB")
 	    .detail("BatchIndex", batchIndex)
 	    .detail("FinishedBatch", finishedBatch->get());
 
@@ -754,7 +784,7 @@ ACTOR static Future<Void> notifyApplierToApplyMutations(Reference<MasterBatchDat
 		// Prepare the applyToDB requests
 		std::vector<std::pair<UID, RestoreVersionBatchRequest>> requests;
 
-		TraceEvent("FastRestoreMasterPhaseApplyMutations")
+		TraceEvent("FastRestoreMasterPhaseApplyToDB")
 		    .detail("BatchIndex", batchIndex)
 		    .detail("Appliers", appliersInterf.size());
 		for (auto& applier : appliersInterf) {
@@ -770,7 +800,7 @@ ACTOR static Future<Void> notifyApplierToApplyMutations(Reference<MasterBatchDat
 			batchData->applyToDB = getBatchReplies(&RestoreApplierInterface::applyToDB, appliersInterf, requests,
 			                                       &replies, TaskPriority::RestoreApplierWriteDB);
 		} else {
-			TraceEvent(SevError, "FastRestoreNotifyApplierToApplierMutations")
+			TraceEvent(SevError, "FastRestoreMasterPhaseApplyToDB")
 			    .detail("BatchIndex", batchIndex)
 			    .detail("Attention", "Actor should not be invoked twice for the same batch index");
 		}
@@ -783,7 +813,7 @@ ACTOR static Future<Void> notifyApplierToApplyMutations(Reference<MasterBatchDat
 			if (batchStatus->applyStatus[reply.id] == RestoreApplyStatus::Applying) {
 				batchStatus->applyStatus[reply.id] = RestoreApplyStatus::Applied;
 				if (reply.isDuplicated) {
-					TraceEvent(SevWarn, "FastRestoreNotifyApplierToApplierMutations")
+					TraceEvent(SevWarn, "FastRestoreMasterPhaseApplyToDB")
 					    .detail("Applier", reply.id)
 					    .detail("DuplicateRequestReturnEarlier", "Apply db request should have been processed");
 				}
@@ -791,7 +821,7 @@ ACTOR static Future<Void> notifyApplierToApplyMutations(Reference<MasterBatchDat
 		}
 		for (auto& applier : appliersInterf) {
 			if (batchStatus->applyStatus[applier.first] != RestoreApplyStatus::Applied) {
-				TraceEvent(SevError, "FastRestoreNotifyApplierToApplierMutations")
+				TraceEvent(SevError, "FastRestoreMasterPhaseApplyToDB")
 				    .detail("Applier", applier.first)
 				    .detail("ApplyStatus", batchStatus->applyStatus[applier.first]);
 			}
@@ -802,6 +832,18 @@ ACTOR static Future<Void> notifyApplierToApplyMutations(Reference<MasterBatchDat
 	TraceEvent("FastRestoreMasterPhaseApplyToDBDone")
 	    .detail("BatchIndex", batchIndex)
 	    .detail("FinishedBatch", finishedBatch->get());
+
+	return Void();
+}
+
+// Notify loaders that all data in the version batch has been applied to DB.
+ACTOR static Future<Void> notifyLoadersVersionBatchFinished(std::map<UID, RestoreLoaderInterface> loadersInterf,
+                                                            int batchIndex) {
+	std::vector<std::pair<UID, RestoreVersionBatchRequest>> requestsToLoaders;
+	for (auto& loader : loadersInterf) {
+		requestsToLoaders.emplace_back(loader.first, RestoreVersionBatchRequest(batchIndex));
+	}
+	wait(sendBatchRequests(&RestoreLoaderInterface::finishVersionBatch, loadersInterf, requestsToLoaders));
 
 	return Void();
 }
@@ -862,4 +904,63 @@ ACTOR static Future<Void> signalRestoreCompleted(Reference<RestoreMasterData> se
 	TraceEvent("FastRestore").detail("RestoreMaster", "AllRestoreCompleted");
 
 	return Void();
+}
+
+// Update the most recent time when master receives hearbeat from each loader and applier
+ACTOR static Future<Void> updateHeartbeatTime(Reference<RestoreMasterData> self) {
+	int numRoles = self->loadersInterf.size() + self->appliersInterf.size();
+	state std::map<UID, RestoreLoaderInterface>::iterator loader = self->loadersInterf.begin();
+	state std::map<UID, RestoreApplierInterface>::iterator applier = self->appliersInterf.begin();
+	state std::vector<Future<RestoreCommonReply>> fReplies(numRoles, Never()); // TODO: Reserve memory for this vector
+	state std::vector<UID> nodes;
+	state int index = 0;
+	state Future<Void> fTimeout = Void();
+
+	// Initialize nodes only once
+	std::transform(self->loadersInterf.begin(), self->loadersInterf.end(), std::back_inserter(nodes),
+	               [](const std::pair<UID, RestoreLoaderInterface>& in) { return in.first; });
+	std::transform(self->appliersInterf.begin(), self->appliersInterf.end(), std::back_inserter(nodes),
+	               [](const std::pair<UID, RestoreApplierInterface>& in) { return in.first; });
+
+	loop {
+		loader = self->loadersInterf.begin();
+		applier = self->appliersInterf.begin();
+		index = 0;
+		std::fill(fReplies.begin(), fReplies.end(), Never());
+		// ping loaders and appliers
+		while(loader != self->loadersInterf.end()) {
+			fReplies[index] = loader->second.heartbeat.getReply(RestoreSimpleRequest());
+			loader++;
+			index++;
+		}
+		while(applier != self->appliersInterf.end()) {
+			fReplies[index] = applier->second.heartbeat.getReply(RestoreSimpleRequest());
+			applier++;
+			index++;
+		}
+
+		fTimeout = delay(SERVER_KNOBS->FASTRESTORE_HEARTBEAT_DELAY);
+		wait(waitForAll(fReplies) || fTimeout);
+		// Update the most recent heart beat time for each role
+		for (int i = 0; i < fReplies.size(); ++i) {
+			if (fReplies[i].isReady()) {
+				double currentTime = now();
+				auto item = self->rolesHeartBeatTime.emplace(nodes[i], currentTime);
+				item.first->second = currentTime;
+			}
+		}
+		wait(fTimeout); // Ensure not updating heartbeat too quickly
+	}
+}
+
+// Check if a restore role dies or disconnected
+ACTOR static Future<Void> checkRolesLiveness(Reference<RestoreMasterData> self) {
+	loop {
+		wait(delay(SERVER_KNOBS->FASTRESTORE_HEARTBEAT_MAX_DELAY));
+		for (auto& role : self->rolesHeartBeatTime) {
+			if (now() - role.second > SERVER_KNOBS->FASTRESTORE_HEARTBEAT_MAX_DELAY) {
+				TraceEvent(SevWarnAlways, "FastRestoreUnavailableRole", role.first).detail("Delta", now() - role.second).detail("LastAliveTime", role.second);
+			}
+		}
+	}
 }
