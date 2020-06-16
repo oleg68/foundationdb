@@ -1651,6 +1651,8 @@ ACTOR Future<Void> runDBAgent(Database src, Database dest) {
 
 	state DatabaseBackupAgent backupAgent(src);
 
+	TraceEvent(SevInfo, "debug.backup.actor.runDBAgent.start");
+		
 	loop {
 		try {
 			wait(backupAgent.run(dest, &pollDelay, CLIENT_KNOBS->BACKUP_TASKS_PER_AGENT));
@@ -1667,6 +1669,8 @@ ACTOR Future<Void> runDBAgent(Database src, Database dest) {
 		}
 	}
 
+	TraceEvent(SevInfo, "backup.actor.runDBAgent.finished");
+		
 	return Void();
 }
 
@@ -1698,6 +1702,8 @@ ACTOR Future<Void> runAgent(Database db) {
 ACTOR Future<Void> submitDBBackup(Database src, Database dest, Standalone<VectorRef<KeyRangeRef>> backupRanges, std::string tagName) {
 	try
 	{
+		printf("Debug: submitDBBackup\n");
+		
 		state DatabaseBackupAgent backupAgent(src);
 
 		// Backup everything, if no ranges were specified
