@@ -2336,7 +2336,7 @@ public:
 		}
 	}
 
-	ACTOR static Future<std::string> getStatus(DatabaseBackupAgent* backupAgent, Database cx, int errorLimit, Key tagName) {
+	ACTOR static Future<std::string> getStatus(DatabaseBackupAgent* backupAgent, Database cx, int errorLimit, Key tagName, bool isShowTasks) {
 		state Reference<ReadYourWritesTransaction> tr(new ReadYourWritesTransaction(cx));
 		tr->setOption(FDBTransactionOptions::LOCK_AWARE);
 		state std::string statusText;
@@ -2415,6 +2415,12 @@ public:
 					default:
 						statusText += "The previous DR on tag `" + tagNameDisplay + "' " + BackupAgentBase::getStateText(backupState) + ".\n";
 						break;
+					}
+					
+					if (isShowTasks) {
+						statusText += "Tasks:\n";
+						wait(backupAgent->taskBucket->dumpTasks(tr, 1));
+						wait(backupAgent->taskBucket->dumpTasks(tr, 0));
 					}
 				}
 
@@ -2515,8 +2521,8 @@ Future<Void> DatabaseBackupAgent::abortBackup(Database cx, Key tagName, bool par
 	return DatabaseBackupAgentImpl::abortBackup(this, cx, tagName, partial, abortOldBackup);
 }
 
-Future<std::string> DatabaseBackupAgent::getStatus(Database cx, int errorLimit, Key tagName) {
-	return DatabaseBackupAgentImpl::getStatus(this, cx, errorLimit, tagName);
+Future<std::string> DatabaseBackupAgent::getStatus(Database cx, int errorLimit, Key tagName, bool isShowTasks) {
+	return DatabaseBackupAgentImpl::getStatus(this, cx, errorLimit, tagName, isShowTasks);
 }
 
 Future<int> DatabaseBackupAgent::getStateValue(Reference<ReadYourWritesTransaction> tr, UID logUid, bool snapshot) {

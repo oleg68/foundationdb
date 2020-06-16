@@ -412,7 +412,7 @@ public:
 
 	Future<Void> abortBackup(Database cx, Key tagName, bool partial = false, bool abortOldBackup = false);
 
-	Future<std::string> getStatus(Database cx, int errorLimit, Key tagName);
+	Future<std::string> getStatus(Database cx, int errorLimit, Key tagName, bool isShowTasks = false);
 
 	Future<int> getStateValue(Reference<ReadYourWritesTransaction> tr, UID logUid, bool snapshot = false);
 	Future<int> getStateValue(Database cx, UID logUid) {

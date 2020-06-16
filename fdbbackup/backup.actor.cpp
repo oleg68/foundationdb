@@ -125,6 +125,9 @@ enum {
 	OPT_CLEANUP,
 
 	OPT_TRACE_FORMAT,
+	
+	//Debug options
+	OPT_SHOW_TASKS
 };
 
 CSimpleOpt::SOption g_rgAgentOptions[] = {
@@ -717,6 +720,7 @@ CSimpleOpt::SOption g_rgDBStatusOptions[] = {
 	{ OPT_HELP,            "--help",           SO_NONE },
 	{ OPT_DEVHELP,         "--dev-help",       SO_NONE },
 	{ OPT_KNOB,            "--knob_",          SO_REQ_SEP },
+	{ OPT_SHOW_TASKS,      "--tasks",	   SO_NONE },
 #ifndef TLS_DISABLED
 	TLS_OPTION_FLAGS
 #endif
@@ -1877,12 +1881,12 @@ ACTOR Future<Void> switchDBBackup(Database src, Database dest, Standalone<Vector
 	return Void();
 }
 
-ACTOR Future<Void> statusDBBackup(Database src, Database dest, std::string tagName, int errorLimit) {
+ACTOR Future<Void> statusDBBackup(Database src, Database dest, std::string tagName, int errorLimit, bool isShowTasks) {
 	try
 	{
 		state DatabaseBackupAgent backupAgent(src);
 
-		std::string	statusText = wait(backupAgent.getStatus(dest, errorLimit, StringRef(tagName)));
+		std::string	statusText = wait(backupAgent.getStatus(dest, errorLimit, StringRef(tagName), isShowTasks));
 		printf("%s\n", statusText.c_str());
 	}
 	catch (Error& e) {
@@ -2949,6 +2953,8 @@ int main(int argc, char* argv[]) {
 		//_set_output_format(_TWO_DIGIT_EXPONENT);
 	#endif
 
+		bool isShowTasks = false;
+
 		while (args->Next()) {
 			lastError = args->LastError();
 
@@ -3259,6 +3265,8 @@ int main(int argc, char* argv[]) {
 				case OPT_JSON:
 					jsonOutput = true;
 					break;
+				case OPT_SHOW_TASKS:
+					isShowTasks = true;
 			}
 		}
 
@@ -3775,7 +3783,7 @@ int main(int argc, char* argv[]) {
 				f = stopAfter( submitDBBackup(sourceDb, db, backupKeys, tagName) );
 				break;
 			case DB_STATUS:
-				f = stopAfter( statusDBBackup(sourceDb, db, tagName, maxErrors) );
+				f = stopAfter( statusDBBackup(sourceDb, db, tagName, maxErrors, isShowTasks) );
 				break;
 			case DB_SWITCH:
 				f = stopAfter( switchDBBackup(sourceDb, db, backupKeys, tagName, forceAction) );
