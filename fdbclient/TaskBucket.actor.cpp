@@ -288,6 +288,7 @@ public:
 	}
 
 	ACTOR static Future<Void> finishTaskRun(Reference<ReadYourWritesTransaction> tr, Reference<TaskBucket> taskBucket, Reference<FutureBucket> futureBucket, Reference<Task> task, Reference<TaskFuncBase> taskFunc, bool verifyTask) {
+		TraceEvent(SevInfo, "debug.TaskBucketImpl::finishTaskRun.before").detail("type", task->params[Task::reservedTaskParamKeyType]);
 		bool isFinished = wait(taskBucket->isFinished(tr, task));
 		if (isFinished) {
 			return Void();
@@ -303,6 +304,7 @@ public:
 		}
 		else {
 			wait(taskFunc->finish(tr, taskBucket, futureBucket, task));
+			TraceEvent(SevInfo, "debug.TaskBucketImpl::finishTaskRun.after").detail("type", task->params[Task::reservedTaskParamKeyType]);
 		}
 
 		return Void();
@@ -394,7 +396,9 @@ public:
 					}
 				}
 
+				TraceEvent(SevError, "debug.TaskBucketImpl::doTask.before").detail("type", task->params[Task::reservedTaskParamKeyType]);
 				wait(taskFunc->execute(cx, taskBucket, futureBucket, task) || extendTimeoutRepeatedly(cx, taskBucket, task));
+				TraceEvent(SevError, "debug.TaskBucketImpl::doTask.after").detail("type", task->params[Task::reservedTaskParamKeyType]);
 
 				if (BUGGIFY) wait(delay(10.0));
 				wait(runRYWTransaction(cx, [=](Reference<ReadYourWritesTransaction> tr) {
@@ -850,6 +854,9 @@ Key TaskBucket::addTask(Reference<ReadYourWritesTransaction> tr, Reference<Task>
 	else {
 		taskSpace = getAvailableSpace(task->getPriority()).get(key);
 	}
+
+	std::cout << "debug.TaskBucket::addTask: taskSpace=" << printable(taskSpace.key()) << std::endl;
+	TraceEvent(SevError, "debug.TaskBucket::addTask").detail("type", task->params[Task::reservedTaskParamKeyType]).detail("space", printable(taskSpace.key()));
 
 	for (auto & param : task->params)
 		tr->set(taskSpace.pack(param.key), param.value);
