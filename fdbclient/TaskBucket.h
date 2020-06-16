@@ -155,8 +155,10 @@ public:
 
 	Future<bool> doTask(Database cx, Reference<FutureBucket> futureBucket, Reference<Task> task);
 
-	Future<bool> doOne(Database cx, Reference<FutureBucket> futureBucket);
+	Future<Void> dumpTasks(Reference<ReadYourWritesTransaction> tr, int priority = 0);
 
+	Future<bool> doOne(Database cx, Reference<FutureBucket> futureBucket);
+	
 	Future<Void> run(Database cx, Reference<FutureBucket> futureBucket, double *pollDelay, int maxConcurrentTasks);
 	Future<Void> watchPaused(Database cx, Reference<AsyncVar<bool>> paused);
 

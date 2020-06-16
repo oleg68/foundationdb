@@ -153,6 +153,23 @@ public:
 		return Optional<Key>();
 	}
 	
+	ACTOR static Future<Void> dumpTasks(Reference<ReadYourWritesTransaction> tr, Reference<TaskBucket> taskBucket, int priority = 0) {
+	  std::cout << "Dumping tasks for prioroty=" << priority << std::endl;
+
+	  taskBucket->setOptions(tr);
+	  
+	  state Subspace space = taskBucket->getAvailableSpace(priority);
+	  state KeyRange spaceRange = space.range();
+	  
+	  Standalone<RangeResultRef> taskKeys = wait(tr->getRange(firstGreaterOrEqual(spaceRange.begin), firstGreaterThan(space.pack(maxUIDKey)), CLIENT_KNOBS->TOO_MANY));
+
+	  for (auto & taskKey : taskKeys) {
+	    std::cout << "  " << taskKey.key.printable() << ":" << taskKey.value.printable() << std::endl;
+	  }
+	  std::cout << "  " << taskKeys.size() << " task keys" << std::endl;
+	  return Void();
+  	}
+	
 	ACTOR static Future<Reference<Task>> getOne(Reference<ReadYourWritesTransaction> tr, Reference<TaskBucket> taskBucket) {
 		if (taskBucket->priority_batch)
 			tr->setOption( FDBTransactionOptions::PRIORITY_BATCH );
@@ -894,6 +911,10 @@ Key TaskBucket::addTask(Reference<ReadYourWritesTransaction> tr, Reference<Task>
 
 Future<Reference<Task>> TaskBucket::getOne(Reference<ReadYourWritesTransaction> tr) {
 	return TaskBucketImpl::getOne(tr, Reference<TaskBucket>::addRef(this));
+}
+
+Future<Void> TaskBucket::dumpTasks(Reference<ReadYourWritesTransaction> tr, int priority) {
+	return TaskBucketImpl::dumpTasks(tr, Reference<TaskBucket>::addRef(this), priority);
 }
 
 Future<bool> TaskBucket::doOne(Database cx, Reference<FutureBucket> futureBucket) {
