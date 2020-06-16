@@ -164,6 +164,8 @@ namespace dbBackup {
 			task->params[BackupAgentBase::keyBeginKey] = begin;
 			task->params[BackupAgentBase::keyEndKey] = end;
 
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc.addTask").detail("begin", begin).detail("end", end);
+			
 			if (!waitFor) {
 				return taskBucket->addTask(tr, task, parentTask->params[Task::reservedTaskParamValidKey], task->params[BackupAgentBase::keyFolderId]);
 			}
@@ -179,8 +181,10 @@ namespace dbBackup {
 			wait(checkTaskVersion(cx, task, BackupRangeTaskFunc::name, BackupRangeTaskFunc::version));
 			// Find out if there is a shard boundary in(beginKey, endKey)
 			Standalone<VectorRef<KeyRef>> keys = wait(runRYWTransaction(taskBucket->src, [=](Reference<ReadYourWritesTransaction> tr){ return getBlockOfShards(tr, task->params[DatabaseBackupAgent::keyBeginKey], task->params[DatabaseBackupAgent::keyEndKey], CLIENT_KNOBS->BACKUP_SHARD_TASK_LIMIT); }));
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.10").detail("keys.size()=", keys.size());
 			if (keys.size() > 0) {
 				task->params[BackupRangeTaskFunc::keyAddBackupRangeTasks] = BinaryWriter::toValue(keys, IncludeVersion());
+				TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.return.because shards exist").detail("keys.size", keys.size());
 				return Void();
 			}
 
@@ -192,6 +196,8 @@ namespace dbBackup {
 			state Key removePrefix = task->params[DatabaseBackupAgent::keyRemovePrefix];
 
 			state KeyRange range(KeyRangeRef(task->params[BackupAgentBase::keyBeginKey], task->params[BackupAgentBase::keyEndKey]));
+			
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.30").detail("range", range);
 
 			// retrieve kvData
 			state PromiseStream<RangeResultWithVersion> results;
@@ -205,6 +211,7 @@ namespace dbBackup {
 			nextValues.second = invalidVersion;
 			loop {
 				if (endOfStream && nextValues.second == invalidVersion) {
+					TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.40-return0").detail("range", range);
 					return Void();
 				}
 				state RangeResultWithVersion values = std::move(nextValues);
@@ -254,15 +261,19 @@ namespace dbBackup {
 
 				if (now() >= timeout) {
 					task->params[BackupRangeTaskFunc::keyBackupRangeBeginKey] = rangeBegin;
+					TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.100-return1").detail("range", range);
 					return Void();
 				}
 
 				rangeEnd = values.first.more ? keyAfter(values.first.end()[-1].key) : range.end;
 
+				TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.40").detail("rangeBegin", rangeBegin).detail("rangeEnd", rangeEnd);
+				
 				state int valueLoc = 0;
 				state int committedValueLoc = 0;
 				state Reference<ReadYourWritesTransaction> tr = Reference<ReadYourWritesTransaction>( new ReadYourWritesTransaction(cx) );
 				loop{
+					TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.50");
 					try {
 						tr->reset();
 						tr->setOption(FDBTransactionOptions::ACCESS_SYSTEM_KEYS);
@@ -296,12 +307,14 @@ namespace dbBackup {
 
 							wait( delay(1) );
 							task->params[BackupRangeTaskFunc::keyBackupRangeBeginKey] = rangeBegin;
+							TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.return.10");
 							return Void();
 						}
 
 						Version logVersion = logVersionValue.get().present() ? BinaryReader::fromStringRef<Version>(logVersionValue.get().get(), Unversioned()) : -1;
 						if (logVersion >= values.second) {
 							task->params[BackupRangeTaskFunc::keyBackupRangeBeginKey] = rangeBegin;
+							TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.return.20");
 							return Void();
 						}
 
@@ -368,6 +381,7 @@ namespace dbBackup {
 						valueLoc = committedValueLoc;
 					}
 				}
+				TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_execute.60");
 
 				rangeBegin = rangeEnd;
 			}
@@ -378,6 +392,8 @@ namespace dbBackup {
 			tr->setOption(FDBTransactionOptions::LOCK_AWARE);
 			state Key nextKey = task->params[BackupAgentBase::keyBeginKey];
 
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::startBackupRangeInternal.10");
+			
 			std::vector<Future<Key>> addTaskVector;
 			for (int idx = 0; idx < keys.size(); ++idx) {
 				if (nextKey != keys[idx]) {
@@ -386,12 +402,17 @@ namespace dbBackup {
 				nextKey = keys[idx];
 			}
 
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::startBackupRangeInternal.20");
+			
 			if (nextKey != task->params[BackupAgentBase::keyEndKey]) {
 				addTaskVector.push_back(addTask(tr, taskBucket, task, nextKey, task->params[BackupAgentBase::keyEndKey], TaskCompletionKey::joinWith(onDone)));
 			}
 
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::startBackupRangeInternal.30");
+			
 			wait(waitForAll(addTaskVector));
 
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::startBackupRangeInternal.90");
 			return Void();
 		}
 
@@ -403,17 +424,23 @@ namespace dbBackup {
 			int64_t bytesWritten = Params.bytesWritten().getOrDefault(task);
 			config.rangeBytesWritten().atomicOp(tr, bytesWritten, MutationRef::AddValue);
 
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_finish.10").detail("bytesWritten", bytesWritten);
+			
 			if (task->params.find(BackupRangeTaskFunc::keyAddBackupRangeTasks) != task->params.end()) {
+				TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_finish.20.1");
 				wait(startBackupRangeInternal(tr, BinaryReader::fromStringRef<Standalone<VectorRef<KeyRef>>>(task->params[BackupRangeTaskFunc::keyAddBackupRangeTasks], IncludeVersion()), taskBucket, futureBucket, task, taskFuture) && taskBucket->finish(tr, task));
 			}
 			else if (task->params.find(BackupRangeTaskFunc::keyBackupRangeBeginKey) != task->params.end() && task->params[BackupRangeTaskFunc::keyBackupRangeBeginKey] < task->params[BackupAgentBase::keyEndKey]) {
+				TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_finish.20.2");
 				ASSERT(taskFuture->key.size() > 0);
 				wait(success(BackupRangeTaskFunc::addTask(tr, taskBucket, task, task->params[BackupRangeTaskFunc::keyBackupRangeBeginKey], task->params[BackupAgentBase::keyEndKey], TaskCompletionKey::signal(taskFuture->key))) && taskBucket->finish(tr, task));
 			}
 			else {
+				TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_finish.20.3");
 				wait(taskFuture->set(tr, taskBucket) && taskBucket->finish(tr, task));
 			}
 
+			TraceEvent(SevInfo, "debug.BackupRangeTaskFunc::_finish.90");
 			return Void();
 		}
 
@@ -665,6 +692,8 @@ namespace dbBackup {
 			task->params[DatabaseBackupAgent::keyBeginVersion] = BinaryWriter::toValue(beginVersion, Unversioned());
 			task->params[DatabaseBackupAgent::keyEndVersion] = BinaryWriter::toValue(endVersion, Unversioned());
 
+			TraceEvent(SevInfo, "debug.CopyLogRangeTaskFunc:: addTask.10").detail("beginVersion", beginVersion).detail("endVersion", endVersion);
+
 			if (!waitFor) {
 				return taskBucket->addTask(tr, task, parentTask->params[Task::reservedTaskParamValidKey], task->params[BackupAgentBase::keyFolderId]);
 			}
@@ -714,6 +743,9 @@ namespace dbBackup {
 			state Version prevBeginVersion = BinaryReader::fromStringRef<Version>(task->params[DatabaseBackupAgent::keyPrevBeginVersion], Unversioned());
 			state Future<Optional<Value>> fStopValue = tr->get(states.pack(DatabaseBackupAgent::keyCopyStop));
 			state Future<Optional<Value>> fAppliedValue = tr->get(task->params[BackupAgentBase::keyConfigLogUid].withPrefix(applyMutationsBeginRange.begin));
+
+
+			TraceEvent(SevInfo, "debug.CopyLogsTaskFunc:: _finish.10").detail("beginVersion", beginVersion).detail("prevBeginVersion", prevBeginVersion);
 
 			Transaction srcTr(taskBucket->src);
 			srcTr.setOption(FDBTransactionOptions::LOCK_AWARE);
@@ -768,6 +800,7 @@ namespace dbBackup {
 					wait(delay(FLOW_KNOBS->PREVENT_FAST_SPIN_DELAY));
 					wait(success(CopyLogsTaskFunc::addTask(tr, taskBucket, task, prevBeginVersion, beginVersion, TaskCompletionKey::signal(onDone))));
 					wait(taskBucket->finish(tr, task));
+					TraceEvent(SevInfo, "debug.CopyLogsTaskFunc:: _finish.return").detail("beginVersion", beginVersion).detail("prevBeginVersion", prevBeginVersion);
 					return Void();
 				}
 
@@ -775,6 +808,7 @@ namespace dbBackup {
 				tr->set(states.pack(DatabaseBackupAgent::keyStateStop), BinaryWriter::toValue(beginVersion, Unversioned()));
 			}
 
+			TraceEvent(SevInfo, "debug.CopyLogsTaskFunc:: _finish.90").detail("beginVersion", beginVersion).detail("prevBeginVersion", prevBeginVersion);
 			return Void();
 		}
 
@@ -786,11 +820,15 @@ namespace dbBackup {
 			task->params[BackupAgentBase::keyBeginVersion] = BinaryWriter::toValue(beginVersion, Unversioned());
 			task->params[DatabaseBackupAgent::keyPrevBeginVersion] = BinaryWriter::toValue(prevBeginVersion, Unversioned());
 
+			TraceEvent(SevInfo, "debug.CopyLogsTaskFunc::addTask.10").detail("beginVersion", beginVersion).detail("prevBeginVersion", prevBeginVersion);
+
 			if (!waitFor) {
+				TraceEvent(SevInfo, "debug.CopyLogsTaskFunc::addTask.return").detail("beginVersion", beginVersion).detail("prevBeginVersion", prevBeginVersion);
 				return taskBucket->addTask(tr, task, parentTask->params[Task::reservedTaskParamValidKey], task->params[BackupAgentBase::keyFolderId]);
 			}
 
 			wait(waitFor->onSetAddTask(tr, taskBucket, task, parentTask->params[Task::reservedTaskParamValidKey], task->params[BackupAgentBase::keyFolderId]));
+			TraceEvent(SevInfo, "debug.CopyLogsTaskFunc::addTask.90").detail("beginVersion", beginVersion).detail("prevBeginVersion", prevBeginVersion);
 			return LiteralStringRef("OnSetAddTask");
 		}
 
@@ -1461,6 +1499,8 @@ namespace dbBackup {
 			wait(checkTaskVersion(cx, task, StartFullBackupTaskFunc::name, StartFullBackupTaskFunc::version));
 			state Key destUidValue(logUidValue);
 
+			TraceEvent(SevError, "debug.StartFullBackupTaskFunc::_execute.10");
+
 			state Standalone<VectorRef<KeyRangeRef>> backupRanges = BinaryReader::fromStringRef<Standalone<VectorRef<KeyRangeRef>>>(task->params[DatabaseBackupAgent::keyConfigBackupRanges], IncludeVersion());
 			state Key beginVersionKey;
 
@@ -1499,6 +1539,8 @@ namespace dbBackup {
 				}
 			}
 
+			TraceEvent(SevError, "debug.StartFullBackupTaskFunc::_execute.20");
+
 			loop {
 				state Reference<ReadYourWritesTransaction> tr(new ReadYourWritesTransaction(cx));
 				try {
@@ -1527,6 +1569,8 @@ namespace dbBackup {
 					wait(tr->onError(e));
 				}
 			}
+
+			TraceEvent(SevError, "debug.StartFullBackupTaskFunc::_execute.30");
 
 			state Reference<ReadYourWritesTransaction> srcTr2(new ReadYourWritesTransaction(taskBucket->src));
 			loop {
@@ -1559,6 +1603,8 @@ namespace dbBackup {
 				}
 			}
 
+			TraceEvent(SevError, "debug.StartFullBackupTaskFunc::_execute.40");
+
 			state Reference<ReadYourWritesTransaction> srcTr3(new ReadYourWritesTransaction(taskBucket->src));
 			loop {
 				try {
@@ -1574,6 +1620,8 @@ namespace dbBackup {
 				}
 			}
 
+			TraceEvent(SevError, "debug.StartFullBackupTaskFunc::_execute.50");
+
 			return Void();
 		}
 
@@ -1584,6 +1632,8 @@ namespace dbBackup {
 
 			state Version beginVersion = BinaryReader::fromStringRef<Version>(task->params[BackupAgentBase::keyBeginVersion], Unversioned());
 			state Standalone<VectorRef<KeyRangeRef>> backupRanges = BinaryReader::fromStringRef<Standalone<VectorRef<KeyRangeRef>>>(task->params[DatabaseBackupAgent::keyConfigBackupRanges], IncludeVersion());
+
+			TraceEvent(SevError, "debug.StartFullBackupTaskFunc::_finish.10");
 
 			tr->set(logUidValue.withPrefix(applyMutationsBeginRange.begin), BinaryWriter::toValue(beginVersion, Unversioned()));
 			tr->set(logUidValue.withPrefix(applyMutationsEndRange.begin), BinaryWriter::toValue(beginVersion, Unversioned()));
@@ -1602,6 +1652,8 @@ namespace dbBackup {
 				kvBackupRangeComplete->set(tr, taskBucket);
 			}
 
+			TraceEvent(SevError, "debug.StartFullBackupTaskFunc::_finish.20");
+
 			// After the BackupRangeTask completes, set the stop key which will stop the BackupLogsTask
 			wait(success(FinishFullBackupTaskFunc::addTask(tr, taskBucket, task, TaskCompletionKey::noSignal(), kvBackupRangeComplete)));
 
@@ -1612,6 +1664,9 @@ namespace dbBackup {
 			wait(success(BackupRestorableTaskFunc::addTask(tr, taskBucket, task, TaskCompletionKey::noSignal(), kvBackupComplete)));
 
 			wait(taskBucket->finish(tr, task));
+
+			TraceEvent(SevError, "debug.StartFullBackupTaskFunc::_finish.90");
+
 			return Void();
 		}
 
@@ -1834,9 +1889,13 @@ public:
 	}
 
 	ACTOR static Future<Void> submitBackup(DatabaseBackupAgent* backupAgent, Reference<ReadYourWritesTransaction> tr, Key tagName, Standalone<VectorRef<KeyRangeRef>> backupRanges, bool stopWhenDone, Key addPrefix, Key removePrefix, bool lockDB, bool databasesInSync) {
+		printf("DatabaseBackupAgent::submitDBBackup tagName=%s\n", tagName.toHexString().c_str());
+
 		state UID logUid = deterministicRandom()->randomUniqueID();
 		state Key logUidValue = BinaryWriter::toValue(logUid, Unversioned());
 		state UID logUidCurrent = wait(backupAgent->getLogUid(tr, tagName));
+
+		printf("DatabaseBackupAgent::submitDBBackup logUid=%s logUidCurrent=%s\n", logUid.toString().c_str(), logUidCurrent.toString().c_str());
 
 		tr->setOption(FDBTransactionOptions::ACCESS_SYSTEM_KEYS);
 		tr->setOption(FDBTransactionOptions::LOCK_AWARE);
@@ -1846,6 +1905,8 @@ public:
 
 		// We will use the global status for now to ensure that multiple backups do not start place with different tags
 		state int status = wait(backupAgent->getStateValue(tr, logUidCurrent));
+
+		printf("DatabaseBackupAgent::submitDBBackup status=%i\n", status);
 
 		if (DatabaseBackupAgent::isRunnable((BackupAgentBase::enumState)status)) {
 			throw backup_duplicate();
@@ -1861,6 +1922,8 @@ public:
 		if(v.present())
 			uidVersion = BinaryReader::fromStringRef<Version>(v.get(), Unversioned()) + 1;
 		state Standalone<StringRef> backupUid = BinaryWriter::toValue(uidVersion, Unversioned());
+
+		printf("DatabaseBackupAgent::submitDBBackup uidVersion=%" PRId64 "\n", uidVersion);
 
 		KeyRangeMap<int> backupRangeSet;
 		for (auto& backupRange : backupRanges) {
