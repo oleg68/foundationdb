@@ -95,3 +95,8 @@ flow/coveragetool/obj
 .DS_Store
 temp/
 /versions.target
+
+# Oleg Samarin local build
+/bld/
+/nbproject/private/
+
