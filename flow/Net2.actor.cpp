@@ -23,12 +23,13 @@
 #define BOOST_SYSTEM_NO_LIB
 #define BOOST_DATE_TIME_NO_LIB
 #define BOOST_REGEX_NO_LIB
-#include "boost/asio.hpp"
-#include "boost/bind.hpp"
-#include "boost/date_time/posix_time/posix_time_types.hpp"
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/range.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include "flow/network.h"
 #include "flow/IThreadPool.h"
-#include "boost/range.hpp"
 
 #include "flow/ActorCollection.h"
 #include "flow/ThreadSafeQueue.h"
@@ -54,10 +55,11 @@ intptr_t g_stackYieldLimit = 0;
 
 using namespace boost::asio::ip;
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__FreeBSD__)
 #include <execinfo.h>
 
-std::atomic<int64_t> net2liveness(0);
+std::atomic<int64_t> net2RunLoopIterations(0);
+std::atomic<int64_t> net2RunLoopSleeps(0);
 
 volatile size_t net2backtraces_max = 10000;
 volatile void** volatile net2backtraces = NULL;
@@ -141,8 +143,13 @@ public:
 		if ( thread_network == this )
 			stopImmediately();
 		else
-			// SOMEDAY: NULL for deferred error, no analysis of correctness (itp)
 			onMainThreadVoid( [this] { this->stopImmediately(); }, NULL );
+	}
+	virtual void addStopCallback( std::function<void()> fn ) {
+		if ( thread_network == this )
+			stopCallbacks.emplace_back(std::move(fn));
+		else
+			onMainThreadVoid( [this, fn] { this->stopCallbacks.emplace_back(std::move(fn)); }, nullptr );
 	}
 
 	virtual bool isSimulated() const { return false; }
@@ -158,6 +165,8 @@ public:
 
 	virtual const TLSConfig& getTLSConfig() { return tlsConfig; }
 
+	virtual bool checkRunnable();
+
 	bool useThreadPool;
 //private:
 
@@ -171,7 +180,7 @@ public:
 
 	INetworkConnections *network;  // initially this, but can be changed
 
-	int64_t tsc_begin, tsc_end;
+	int64_t tscBegin, tscEnd;
 	double taskBegin;
 	TaskPriority currentTaskID;
 	uint64_t tasksIssued;
@@ -180,9 +189,11 @@ public:
 	bool stopped;
 	std::map<IPAddress, bool> addressOnHostCache;
 
+	std::atomic<bool> started;
+
 	uint64_t numYields;
 
-	TaskPriority lastMinTaskID;
+	NetworkMetrics::PriorityStats* lastPriorityStats;
 
 	std::priority_queue<OrderedTask, std::vector<OrderedTask>> ready;
 	ThreadSafeQueue<OrderedTask> threadReady;
@@ -195,9 +206,9 @@ public:
 	std::priority_queue<DelayedTask, std::vector<DelayedTask>> timers;
 
 	void checkForSlowTask(int64_t tscBegin, int64_t tscEnd, double duration, TaskPriority priority);
-	bool check_yield(TaskPriority taskId, bool isRunLoop);
+	bool check_yield(TaskPriority taskId, int64_t tscNow);
 	void processThreadReady();
-	void trackMinPriority( TaskPriority minTaskID, double now );
+	void trackAtPriority( TaskPriority priority, double now );
 	void stopImmediately() {
 		stopped=true; decltype(ready) _1; ready.swap(_1); decltype(timers) _2; timers.swap(_2);
 	}
@@ -221,7 +232,7 @@ public:
 	Int64MetricHandle countYieldCalls;
 	Int64MetricHandle countYieldCallsTrue;
 	Int64MetricHandle countASIOEvents;
-	Int64MetricHandle countSlowTaskSignals;
+	Int64MetricHandle countRunLoopProfilingSignals;
 	Int64MetricHandle countTLSPolicyFailures;
 	Int64MetricHandle priorityMetric;
 	DoubleMetricHandle countLaunchTime;
@@ -231,6 +242,7 @@ public:
 	EventMetricHandle<SlowTask> slowTaskMetric;
 
 	std::vector<std::string> blobCredentialFiles;
+	std::vector<std::function<void()>> stopCallbacks;
 };
 
 static boost::asio::ip::address tcpAddress(IPAddress const& n) {
@@ -252,7 +264,7 @@ class BindPromise {
 public:
 	BindPromise( const char* errContext, UID errID ) : errContext(errContext), errID(errID) {}
 	BindPromise( BindPromise const& r ) : p(r.p), errContext(r.errContext), errID(r.errID) {}
-	BindPromise(BindPromise&& r) BOOST_NOEXCEPT : p(std::move(r.p)), errContext(r.errContext), errID(r.errID) {}
+	BindPromise(BindPromise&& r) noexcept : p(std::move(r.p)), errContext(r.errContext), errID(r.errID) {}
 
 	Future<Void> getFuture() { return p.getFuture(); }
 
@@ -260,11 +272,19 @@ public:
 		try {
 			if (error) {
 				// Log the error...
-				TraceEvent(SevWarn, errContext, errID).suppressFor(1.0).detail("ErrorCode", error.value()).detail("Message", error.message())
+				{
+					TraceEvent evt(SevWarn, errContext, errID);
+					evt.suppressFor(1.0).detail("ErrorCode", error.value()).detail("Message", error.message());
 #ifndef TLS_DISABLED
-				.detail("WhichMeans", TLSPolicy::ErrorString(error))
+					// There is no function in OpenSSL to use to check if an error code is from OpenSSL,
+					// but all OpenSSL errors have a non-zero "library" code set in bits 24-32, and linux
+					// error codes should never go that high.
+					if (error.value() >= (1 << 24L)) {
+						evt.detail("WhichMeans", TLSPolicy::ErrorString(error));
+					}
 #endif
-				;
+				}
+				
 				p.sendError( connection_failed() );
 			} else
 				p.send( Void() );
@@ -273,6 +293,35 @@ public:
 		} catch (...) {
 			p.sendError(unknown_error());
 		}
+	}
+};
+
+struct SendBufferIterator {
+	typedef boost::asio::const_buffer value_type;
+	typedef std::forward_iterator_tag iterator_category;
+	typedef size_t difference_type;
+	typedef boost::asio::const_buffer* pointer;
+	typedef boost::asio::const_buffer& reference;
+
+	SendBuffer const* p;
+	int limit;
+
+	SendBufferIterator(SendBuffer const* p=0, int limit = std::numeric_limits<int>::max()) : p(p), limit(limit) {
+		ASSERT(limit > 0);
+	}
+
+	bool operator == (SendBufferIterator const& r) const { return p == r.p; }
+	bool operator != (SendBufferIterator const& r) const { return p != r.p; }
+	void operator++() {
+		limit -= p->bytes_written - p->bytes_sent;
+		if(limit > 0)
+			p = p->next;
+		else
+			p = NULL;
+	}
+
+	boost::asio::const_buffer operator*() const {
+		return boost::asio::const_buffer( p->data + p->bytes_sent, std::min(limit, p->bytes_written - p->bytes_sent) );
 	}
 };
 
@@ -399,35 +448,6 @@ private:
 	UID id;
 	tcp::socket socket;
 	NetworkAddress peer_address;
-
-	struct SendBufferIterator {
-		typedef boost::asio::const_buffer value_type;
-		typedef std::forward_iterator_tag iterator_category;
-		typedef size_t difference_type;
-		typedef boost::asio::const_buffer* pointer;
-		typedef boost::asio::const_buffer& reference;
-
-		SendBuffer const* p;
-		int limit;
-
-		SendBufferIterator(SendBuffer const* p=0, int limit = std::numeric_limits<int>::max()) : p(p), limit(limit) {
-			ASSERT(limit > 0);
-		}
-
-		bool operator == (SendBufferIterator const& r) const { return p == r.p; }
-		bool operator != (SendBufferIterator const& r) const { return p != r.p; }
-		void operator++() {
-			limit -= p->bytes_written - p->bytes_sent;
-			if(limit > 0)
-				p = p->next;
-			else
-				p = NULL;
-		}
-
-		boost::asio::const_buffer operator*() const {
-			return boost::asio::const_buffer( p->data + p->bytes_sent, std::min(limit, p->bytes_written - p->bytes_sent) );
-		}
-	};
 
 	void init() {
 		// Socket settings that have to be set after connect or accept succeeds
@@ -701,6 +721,10 @@ public:
 
 	// Writes as many bytes as possible from the given SendBuffer chain into the write buffer and returns the number of bytes written (might be 0)
 	virtual int write( SendBuffer const* data, int limit ) {
+#ifdef __APPLE__
+		// For some reason, writing ssl_sock with more than 2016 bytes when socket is writeable sometimes results in a broken pipe error.
+		limit = std::min(limit, 2016);
+#endif
 		boost::system::error_code err;
 		++g_net2->countWrites;
 
@@ -743,35 +767,6 @@ private:
 	NetworkAddress peer_address;
 	Reference<ReferencedObject<boost::asio::ssl::context>> sslContext;
 
-	struct SendBufferIterator {
-		typedef boost::asio::const_buffer value_type;
-		typedef std::forward_iterator_tag iterator_category;
-		typedef size_t difference_type;
-		typedef boost::asio::const_buffer* pointer;
-		typedef boost::asio::const_buffer& reference;
-
-		SendBuffer const* p;
-		int limit;
-
-		SendBufferIterator(SendBuffer const* p=0, int limit = std::numeric_limits<int>::max()) : p(p), limit(limit) {
-			ASSERT(limit > 0);
-		}
-
-		bool operator == (SendBufferIterator const& r) const { return p == r.p; }
-		bool operator != (SendBufferIterator const& r) const { return p != r.p; }
-		void operator++() {
-			limit -= p->bytes_written - p->bytes_sent;
-			if(limit > 0)
-				p = p->next;
-			else
-				p = NULL;
-		}
-
-		boost::asio::const_buffer operator*() const {
-			return boost::asio::const_buffer( p->data + p->bytes_sent, std::min(limit, p->bytes_written - p->bytes_sent) );
-		}
-	};
-
 	void init() {
 		// Socket settings that have to be set after connect or accept succeeds
 		socket.non_blocking(true);
@@ -789,11 +784,11 @@ private:
 	}
 
 	void onReadError( const boost::system::error_code& error ) {
-		TraceEvent(SevWarn, "N2_ReadError", id).suppressFor(1.0).detail("Message", error.value());
+		TraceEvent(SevWarn, "N2_ReadError", id).suppressFor(1.0).detail("ErrorCode", error.value()).detail("Message", error.message());
 		closeSocket();
 	}
 	void onWriteError( const boost::system::error_code& error ) {
-		TraceEvent(SevWarn, "N2_WriteError", id).suppressFor(1.0).detail("Message", error.value());
+		TraceEvent(SevWarn, "N2_WriteError", id).suppressFor(1.0).detail("ErrorCode", error.value()).detail("Message", error.message());
 		closeSocket();
 	}
 };
@@ -846,7 +841,7 @@ private:
 struct PromiseTask : public Task, public FastAllocated<PromiseTask> {
 	Promise<Void> promise;
 	PromiseTask() {}
-	explicit PromiseTask( Promise<Void>&& promise ) BOOST_NOEXCEPT : promise(std::move(promise)) {}
+	explicit PromiseTask(Promise<Void>&& promise) noexcept : promise(std::move(promise)) {}
 
 	virtual void operator()() {
 		promise.send(Void());
@@ -863,11 +858,12 @@ Net2::Net2(const TLSConfig& tlsConfig, bool useThreadPool, bool useMetrics)
 	  stopped(false),
 	  tasksIssued(0),
 	  // Until run() is called, yield() will always yield
-	  tsc_begin(0), tsc_end(0), taskBegin(0), currentTaskID(TaskPriority::DefaultYield),
-	  lastMinTaskID(TaskPriority::Zero),
+	  tscBegin(0), tscEnd(0), taskBegin(0), currentTaskID(TaskPriority::DefaultYield),
 	  numYields(0),
+	  lastPriorityStats(nullptr),
 	  tlsInitialized(false),
-	  tlsConfig(tlsConfig)
+	  tlsConfig(tlsConfig),
+	  started(false)
 #ifndef TLS_DISABLED
 	  ,sslContextVar({ReferencedObject<boost::asio::ssl::context>::from(boost::asio::ssl::context(boost::asio::ssl::context::tls))})
 #endif
@@ -887,13 +883,7 @@ Net2::Net2(const TLSConfig& tlsConfig, bool useThreadPool, bool useMetrics)
 	setGlobal(INetwork::enEventFD, (flowGlobalType) N2::ASIOReactor::newEventFD(reactor));
 #endif
 
-
-	int priBins[] = { 1, 2050, 3050, 4050, 4950, 5050, 7050, 8050, 10050 };
-	static_assert( sizeof(priBins) == sizeof(int)*NetworkMetrics::PRIORITY_BINS, "Fix priority bins");
-	for(int i=0; i<NetworkMetrics::PRIORITY_BINS; i++)
-		networkInfo.metrics.priorityBins[i] = static_cast<TaskPriority>(priBins[i]);
 	updateNow();
-
 }
 
 #ifndef TLS_DISABLED
@@ -901,13 +891,19 @@ ACTOR static Future<Void> watchFileForChanges( std::string filename, AsyncTrigge
 	if (filename == "") {
 		return Never();
 	}
-	state std::time_t lastModTime = wait(IAsyncFileSystem::filesystem()->lastWriteTime(filename));
+	state bool firstRun = true;
+	state bool statError = false;
+	state std::time_t lastModTime = 0;
 	loop {
-		wait(delay(FLOW_KNOBS->TLS_CERT_REFRESH_DELAY_SECONDS));
 		try {
 			std::time_t modtime = wait(IAsyncFileSystem::filesystem()->lastWriteTime(filename));
-			if (lastModTime != modtime) {
+			if (firstRun) {
 				lastModTime = modtime;
+				firstRun = false;
+			}
+			if (lastModTime != modtime || statError) {
+				lastModTime = modtime;
+				statError = false;
 				fileChanged->trigger();
 			}
 		} catch (Error& e) {
@@ -917,10 +913,12 @@ ACTOR static Future<Void> watchFileForChanges( std::string filename, AsyncTrigge
 				// certificates, then there's no point in crashing, but we should complain
 				// loudly.  IAsyncFile will log the error, but not necessarily as a warning.
 				TraceEvent(SevWarnAlways, "TLSCertificateRefreshStatError").detail("File", filename);
+				statError = true;
 			} else {
 				throw;
 			}
 		}
+		wait(delay(FLOW_KNOBS->TLS_CERT_REFRESH_DELAY_SECONDS));
 	}
 }
 
@@ -969,16 +967,22 @@ void Net2::initTLS() {
 		return;
 	}
 #ifndef TLS_DISABLED
+	auto onPolicyFailure = [this]() { this->countTLSPolicyFailures++; };
 	try {
 		boost::asio::ssl::context newContext(boost::asio::ssl::context::tls);
-		auto onPolicyFailure = [this]() { this->countTLSPolicyFailures++; };
+		const LoadedTLSConfig& loaded = tlsConfig.loadSync();
+		TraceEvent("Net2TLSConfig")
+			.detail("CAPath", tlsConfig.getCAPathSync())
+			.detail("CertificatePath", tlsConfig.getCertificatePathSync())
+			.detail("KeyPath", tlsConfig.getKeyPathSync())
+			.detail("HasPassword", !loaded.getPassword().empty())
+			.detail("VerifyPeers", boost::algorithm::join(loaded.getVerifyPeers(), "|"));
 		ConfigureSSLContext( tlsConfig.loadSync(), &newContext, onPolicyFailure );
 		sslContextVar.set(ReferencedObject<boost::asio::ssl::context>::from(std::move(newContext)));
-		backgroundCertRefresh = reloadCertificatesOnChange( tlsConfig, onPolicyFailure, &sslContextVar );
 	} catch (Error& e) {
 		TraceEvent("Net2TLSInitError").error(e);
-		throw tls_error();
 	}
+	backgroundCertRefresh = reloadCertificatesOnChange( tlsConfig, onPolicyFailure, &sslContextVar );
 #endif
 	tlsInitialized = true;
 }
@@ -1009,13 +1013,17 @@ void Net2::initMetrics() {
 	countYieldCalls.init(LiteralStringRef("Net2.CountYieldCalls"));
 	countASIOEvents.init(LiteralStringRef("Net2.CountASIOEvents"));
 	countYieldCallsTrue.init(LiteralStringRef("Net2.CountYieldCallsTrue"));
-	countSlowTaskSignals.init(LiteralStringRef("Net2.CountSlowTaskSignals"));
+	countRunLoopProfilingSignals.init(LiteralStringRef("Net2.CountRunLoopProfilingSignals"));
 	countTLSPolicyFailures.init(LiteralStringRef("Net2.CountTLSPolicyFailures"));
 	priorityMetric.init(LiteralStringRef("Net2.Priority"));
 	awakeMetric.init(LiteralStringRef("Net2.Awake"));
 	slowTaskMetric.init(LiteralStringRef("Net2.SlowTask"));
 	countLaunchTime.init(LiteralStringRef("Net2.CountLaunchTime"));
 	countReactTime.init(LiteralStringRef("Net2.CountReactTime"));
+}
+
+bool Net2::checkRunnable() {
+	return !started.exchange(true);
 }
 
 void Net2::run() {
@@ -1040,6 +1048,7 @@ void Net2::run() {
 	typedef void (*runCycleFuncPtr)();
 	runCycleFuncPtr runFunc = reinterpret_cast<runCycleFuncPtr>(reinterpret_cast<flowGlobalType>(g_network->global(INetwork::enRunCycleFunc)));
 
+	started.store(true);
 	double nnow = timer_monotonic();
 
 	while(!stopped) {
@@ -1047,13 +1056,14 @@ void Net2::run() {
 		++countRunLoop;
 
 		if (runFunc) {
-			tsc_begin = __rdtsc();
+			tscBegin = timestampCounter();
 			taskBegin = nnow;
-			trackMinPriority(TaskPriority::RunCycleFunction, taskBegin);
+			trackAtPriority(TaskPriority::RunCycleFunction, taskBegin);
 			runFunc();
 			double taskEnd = timer_monotonic();
+			trackAtPriority(TaskPriority::RunLoop, taskEnd);
 			countLaunchTime += taskEnd - taskBegin;
-			checkForSlowTask(tsc_begin, __rdtsc(), taskEnd - taskBegin, TaskPriority::RunCycleFunction);
+			checkForSlowTask(tscBegin, timestampCounter(), taskEnd - taskBegin, TaskPriority::RunCycleFunction);
 		}
 
 		double sleepTime = 0;
@@ -1070,7 +1080,12 @@ void Net2::run() {
 				sleepTime = timers.top().at - sleepStart;  // + 500e-6?
 			}
 			if (sleepTime > 0) {
-				trackMinPriority(TaskPriority::Zero, sleepStart);
+#if defined(__linux__)
+				// notify the run loop monitoring thread that we have gone idle
+				net2RunLoopSleeps.fetch_add(1);
+#endif
+
+				trackAtPriority(TaskPriority::Zero, sleepStart);
 				awakeMetric = false;
 				priorityMetric = 0;
 				reactor.sleep(sleepTime);
@@ -1078,16 +1093,17 @@ void Net2::run() {
 			}
 		}
 
-		tsc_begin = __rdtsc();
+		tscBegin = timestampCounter();
 		taskBegin = timer_monotonic();
-		trackMinPriority(TaskPriority::ASIOReactor, taskBegin);
+		trackAtPriority(TaskPriority::ASIOReactor, taskBegin);
 		reactor.react();
 		
 		updateNow();
 		double now = this->currentTime;
+		trackAtPriority(TaskPriority::RunLoop, now);
 
 		countReactTime += now - taskBegin;
-		checkForSlowTask(tsc_begin, __rdtsc(), now - taskBegin, TaskPriority::ASIOReactor);
+		checkForSlowTask(tscBegin, timestampCounter(), now - taskBegin, TaskPriority::ASIOReactor);
 
 		if ((now-nnow) > FLOW_KNOBS->SLOW_LOOP_CUTOFF && nondeterministicRandom()->random01() < (now-nnow)*FLOW_KNOBS->SLOW_LOOP_SAMPLING_RATE)
 			TraceEvent("SomewhatSlowRunLoopTop").detail("Elapsed", now - nnow);
@@ -1104,8 +1120,8 @@ void Net2::run() {
 
 		processThreadReady();
 
-		tsc_begin = __rdtsc();
-		tsc_end = tsc_begin + FLOW_KNOBS->TSC_YIELD_TIME;
+		tscBegin = timestampCounter();
+		tscEnd = tscBegin + FLOW_KNOBS->TSC_YIELD_TIME;
 		taskBegin = timer_monotonic();
 		numYields = 0;
 		TaskPriority minTaskID = TaskPriority::Max;
@@ -1115,8 +1131,11 @@ void Net2::run() {
 		while (!ready.empty()) {
 			++countTasks;
 			currentTaskID = ready.top().taskID;
+			if(currentTaskID < minTaskID) {
+				trackAtPriority(currentTaskID, taskBegin);
+				minTaskID = currentTaskID;
+			}
 			priorityMetric = static_cast<int64_t>(currentTaskID);
-			minTaskID = std::min(minTaskID, currentTaskID);
 			Task* task = ready.top().task;
 			ready.pop();
 
@@ -1128,19 +1147,26 @@ void Net2::run() {
 				TraceEvent(SevError, "TaskError").error(unknown_error());
 			}
 
-			if (check_yield(TaskPriority::Max, true)) {
+			double tscNow = timestampCounter();
+			double newTaskBegin = timer_monotonic();
+			if (check_yield(TaskPriority::Max, tscNow)) {
+				checkForSlowTask(tscBegin, tscNow, newTaskBegin - taskBegin, currentTaskID);
 				FDB_TRACE_PROBE(run_loop_yield);
 				++countYields;
-                break;
+				break;
 			}
+
+			taskBegin = newTaskBegin;
+			tscBegin = tscNow;
 		}
+
+		trackAtPriority(TaskPriority::RunLoop, taskBegin);
+
 		queueSize = ready.size();
 		FDB_TRACE_PROBE(run_loop_done, queueSize);
 
-		trackMinPriority(minTaskID, now);
-
 #if defined(__linux__)
-		if(FLOW_KNOBS->SLOWTASK_PROFILING_INTERVAL > 0) {
+		if(FLOW_KNOBS->RUN_LOOP_PROFILING_INTERVAL > 0) {
 			sigset_t orig_set;
 			pthread_sigmask(SIG_BLOCK, &sigprof_set, &orig_set);
 
@@ -1148,7 +1174,7 @@ void Net2::run() {
 			bool was_overflow = net2backtraces_overflow;
 			int signal_count = net2backtraces_count;
 
-			countSlowTaskSignals += signal_count;
+			countRunLoopProfilingSignals += signal_count;
 
 			if (other_offset) {
 				volatile void** _traces = net2backtraces;
@@ -1164,7 +1190,7 @@ void Net2::run() {
 			pthread_sigmask(SIG_SETMASK, &orig_set, NULL);
 
 			if (was_overflow) {
-				TraceEvent("Net2SlowTaskOverflow")
+				TraceEvent("Net2RunLoopProfilerOverflow")
 					.detail("SignalsReceived", signal_count)
 					.detail("BackTraceHarvested", other_offset != 0);
 			}
@@ -1172,13 +1198,13 @@ void Net2::run() {
 				size_t iter_offset = 0;
 				while (iter_offset < other_offset) {
 					ProfilingSample *ps = (ProfilingSample *)(other_backtraces + iter_offset);
-					TraceEvent(SevWarn, "Net2SlowTaskTrace").detailf("TraceTime", "%.6f", ps->timestamp).detail("Trace", platform::format_backtrace(ps->frames, ps->length));
+					TraceEvent(SevWarn, "Net2RunLoopTrace").detailf("TraceTime", "%.6f", ps->timestamp).detail("Trace", platform::format_backtrace(ps->frames, ps->length));
 					iter_offset += ps->length + 2;
 				}
 			}
 
-			// to keep the thread liveness check happy
-			net2liveness.fetch_add(1);
+			// notify the run loop monitoring thread that we are making progress 
+			net2RunLoopIterations.fetch_add(1);
 		}
 #endif
 		nnow = timer_monotonic();
@@ -1187,29 +1213,52 @@ void Net2::run() {
 			TraceEvent("SomewhatSlowRunLoopBottom").detail("Elapsed", nnow - now); // This includes the time spent running tasks
 	}
 
+	for ( auto& fn : stopCallbacks ) {
+		fn();
+	}
+
 	#ifdef WIN32
 	timeEndPeriod(1);
 	#endif
 }
 
-void Net2::trackMinPriority( TaskPriority minTaskID, double now ) {
-	if (minTaskID != lastMinTaskID) {
-		for(int c=0; c<NetworkMetrics::PRIORITY_BINS; c++) {
-			TaskPriority pri = networkInfo.metrics.priorityBins[c];
-			if (pri > minTaskID && pri <= lastMinTaskID) {  // busy -> idle
-				networkInfo.metrics.priorityBlocked[c] = false;
-				networkInfo.metrics.priorityBlockedDuration[c] += now - networkInfo.metrics.windowedPriorityTimer[c];
-				networkInfo.metrics.priorityMaxBlockedDuration[c] = std::max(networkInfo.metrics.priorityMaxBlockedDuration[c], now - networkInfo.metrics.priorityTimer[c]);
+void Net2::trackAtPriority( TaskPriority priority, double now ) {
+	if (lastPriorityStats == nullptr || priority != lastPriorityStats->priority) {
+		// Start tracking current priority
+		auto activeStatsItr = networkInfo.metrics.activeTrackers.try_emplace(priority, priority);
+		activeStatsItr.first->second.active = true;
+		activeStatsItr.first->second.windowedTimer = now;
+
+		if(lastPriorityStats != nullptr) {
+			// Stop tracking previous priority
+			lastPriorityStats->active = false;
+			lastPriorityStats->duration += now - lastPriorityStats->windowedTimer;
+		}
+
+		// Update starvation trackers
+		TaskPriority lastPriority = (lastPriorityStats == nullptr) ? TaskPriority::Zero : lastPriorityStats->priority;
+		for(auto& binStats : networkInfo.metrics.starvationTrackers) {
+			if(binStats.priority > lastPriority && binStats.priority > priority) {
+				break;
 			}
-			if (pri <= minTaskID && pri > lastMinTaskID) {  // idle -> busy
-				networkInfo.metrics.priorityBlocked[c] = true;
-				networkInfo.metrics.priorityTimer[c] = now;
-				networkInfo.metrics.windowedPriorityTimer[c] = now;
+
+			// Busy -> idle at binStats.priority
+			if(binStats.priority > priority && binStats.priority <= lastPriority) { 
+				binStats.active = false;
+				binStats.duration += now - binStats.windowedTimer;
+				binStats.maxDuration = std::max(binStats.maxDuration, now - binStats.timer);
+			}
+
+			// Idle -> busy at binStats.priority
+			else if(binStats.priority <= priority && binStats.priority > lastPriority) {
+				binStats.active = true;
+				binStats.timer = now;
+				binStats.windowedTimer = now;
 			}
 		}
-	}
 
-	lastMinTaskID = minTaskID;
+		lastPriorityStats = &activeStatsItr.first->second;
+	}
 }
 
 void Net2::processThreadReady() {
@@ -1241,7 +1290,8 @@ void Net2::checkForSlowTask(int64_t tscBegin, int64_t tscEnd, double duration, T
 		slowTaskMetric->log();
 
 		double sampleRate = std::min(1.0, (elapsed > warnThreshold) ? 1.0 : elapsed / 10e9);
-		if(FLOW_KNOBS->SLOWTASK_PROFILING_INTERVAL > 0 && duration > FLOW_KNOBS->SLOWTASK_PROFILING_INTERVAL) {
+		double slowTaskProfilingLogInterval = std::max(FLOW_KNOBS->RUN_LOOP_PROFILING_INTERVAL, FLOW_KNOBS->SLOWTASK_PROFILING_LOG_INTERVAL);
+		if(slowTaskProfilingLogInterval > 0 && duration > slowTaskProfilingLogInterval) {
 			sampleRate = 1; // Always include slow task events that could show up in our slow task profiling.
 		}
 
@@ -1250,12 +1300,8 @@ void Net2::checkForSlowTask(int64_t tscBegin, int64_t tscEnd, double duration, T
 	}
 }
 
-bool Net2::check_yield( TaskPriority taskID, bool isRunLoop ) {
-	if(!isRunLoop && numYields > 0) {
-		++numYields;
-		return true;
-	}
-
+bool Net2::check_yield( TaskPriority taskID, int64_t tscNow ) {
+	// SOMEDAY: Yield if there are lots of higher priority tasks queued?
 	if ((g_stackYieldLimit) && ( (intptr_t)&taskID < g_stackYieldLimit )) {
 		++countYieldBigStack;
 		return true;
@@ -1268,35 +1314,31 @@ bool Net2::check_yield( TaskPriority taskID, bool isRunLoop ) {
 		return true;
 	}
 
-	// SOMEDAY: Yield if there are lots of higher priority tasks queued?
-	int64_t tsc_now = __rdtsc();
-	double newTaskBegin = timer_monotonic();
-	if (tsc_now < tsc_begin) {
+	if (tscNow < tscBegin) {
 		return true;
 	}
 
-	if(isRunLoop) {
-		checkForSlowTask(tsc_begin, tsc_now, newTaskBegin-taskBegin, currentTaskID);
-	}
-
-	if (tsc_now > tsc_end) {
+	if (tscNow > tscEnd) {
 		++numYields;
 		return true;
 	}
 
-	taskBegin = newTaskBegin;
-	tsc_begin = tsc_now;
 	return false;
 }
 
 bool Net2::check_yield( TaskPriority taskID ) {
-	return check_yield(taskID, false);
+	if(numYields > 0) {
+		++numYields;
+		return true;
+	}
+
+	return check_yield(taskID, timestampCounter());
 }
 
 Future<class Void> Net2::yield( TaskPriority taskID ) {
 	++countYieldCalls;
 	if (taskID == TaskPriority::DefaultYield) taskID = currentTaskID;
-	if (check_yield(taskID, false)) {
+	if (check_yield(taskID)) {
 		++countYieldCallsTrue;
 		return delay(0, taskID);
 	}

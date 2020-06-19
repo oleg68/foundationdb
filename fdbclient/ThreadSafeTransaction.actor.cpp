@@ -21,10 +21,7 @@
 #include "fdbclient/ThreadSafeTransaction.h"
 #include "fdbclient/ReadYourWrites.h"
 #include "fdbclient/DatabaseContext.h"
-#if defined(CMAKE_BUILD) || !defined(WIN32)
-#include "versions.h"
-#endif
-#include <new>
+#include "fdbclient/versions.h"
 
 // Users of ThreadSafeTransaction might share Reference<ThreadSafe...> between different threads as long as they don't call addRef (e.g. C API follows this).
 // Therefore, it is unsafe to call (explicitly or implicitly) this->addRef in any of these functions.
@@ -329,12 +326,12 @@ ThreadFuture<Void> ThreadSafeTransaction::onError( Error const& e ) {
 	return onMainThread( [tr, e](){ return tr->onError(e); } );
 }
 
-void ThreadSafeTransaction::operator=(ThreadSafeTransaction&& r) BOOST_NOEXCEPT {
+void ThreadSafeTransaction::operator=(ThreadSafeTransaction&& r) noexcept {
 	tr = r.tr;
 	r.tr = NULL;
 }
 
-ThreadSafeTransaction::ThreadSafeTransaction(ThreadSafeTransaction&& r) BOOST_NOEXCEPT {
+ThreadSafeTransaction::ThreadSafeTransaction(ThreadSafeTransaction&& r) noexcept {
 	tr = r.tr;
 	r.tr = NULL;
 }

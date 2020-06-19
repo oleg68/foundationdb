@@ -85,17 +85,6 @@ void ISimulator::displayWorkers() const
 	return;
 }
 
-namespace std {
-template<>
-class hash<Endpoint> {
-public:
-	size_t operator()(const Endpoint &s) const
-	{
-		return crc32c_append(0, (const uint8_t*)&s, sizeof(s));
-	}
-};
-}
-
 const UID TOKEN_ENDPOINT_NOT_FOUND(-1, -1);
 
 ISimulator* g_pSimulator = 0;
@@ -871,7 +860,16 @@ public:
 		return emptyConfig;
 	}
 
-	virtual void stop() { isStopped = true; }
+	virtual bool checkRunnable() {
+		return net2->checkRunnable();
+	}
+
+	virtual void stop() {
+		isStopped = true;
+	}
+	virtual void addStopCallback( std::function<void()> fn ) {
+		stopCallbacks.emplace_back(std::move(fn));
+	}
 	virtual bool isSimulated() const { return true; }
 
 	struct SimThreadArgs {
@@ -995,6 +993,9 @@ public:
 		}
 		self->currentProcess = callingMachine;
 		self->net2->stop();
+		for ( auto& fn : self->stopCallbacks ) {
+			fn();
+		}
 		return Void();
 	}
 
@@ -1046,7 +1047,7 @@ public:
 		m->machine = &machine;
 		machine.processes.push_back(m);
 		currentlyRebootingProcesses.erase(addresses.address);
-		m->excluded = g_simulator.isExcluded(addresses.address);
+		m->excluded = g_simulator.isExcluded(NetworkAddress(ip, port, true, false));
 		m->cleared = g_simulator.isCleared(addresses.address);
 
 		m->setGlobal(enTDMetrics, (flowGlobalType) &m->tdmetrics);
@@ -1615,6 +1616,7 @@ public:
 		// Not letting currentProcess be NULL eliminates some annoying special cases
 		currentProcess = new ProcessInfo("NoMachine", LocalityData(Optional<Standalone<StringRef>>(), StringRef(), StringRef(), StringRef()), ProcessClass(), {NetworkAddress()}, this, "", "");
 		g_network = net2 = newNet2(TLSConfig(), false, true);
+		g_network->addStopCallback( Net2FileSystem::stop );
 		Net2FileSystem::newFileSystem();
 		check_yield(TaskPriority::Zero);
 	}
@@ -1628,10 +1630,18 @@ public:
 		Promise<Void> action;
 		Task( double time, TaskPriority taskID, uint64_t stable, ProcessInfo* machine, Promise<Void>&& action ) : time(time), taskID(taskID), stable(stable), machine(machine), action(std::move(action)) {}
 		Task( double time, TaskPriority taskID, uint64_t stable, ProcessInfo* machine, Future<Void>& future ) : time(time), taskID(taskID), stable(stable), machine(machine) { future = action.getFuture(); }
-		Task(Task&& rhs) BOOST_NOEXCEPT : time(rhs.time), taskID(rhs.taskID), stable(rhs.stable), machine(rhs.machine), action(std::move(rhs.action)) {}
+		Task(Task&& rhs) noexcept
+		  : time(rhs.time), taskID(rhs.taskID), stable(rhs.stable), machine(rhs.machine),
+		    action(std::move(rhs.action)) {}
 		void operator= ( Task const& rhs ) { taskID = rhs.taskID; time = rhs.time; stable = rhs.stable; machine = rhs.machine; action = rhs.action; }
 		Task( Task const& rhs ) : taskID(rhs.taskID), time(rhs.time), stable(rhs.stable), machine(rhs.machine), action(rhs.action) {}
-		void operator= (Task&& rhs) BOOST_NOEXCEPT { time = rhs.time; taskID = rhs.taskID; stable = rhs.stable; machine = rhs.machine; action = std::move(rhs.action); }
+		void operator=(Task&& rhs) noexcept {
+			time = rhs.time;
+			taskID = rhs.taskID;
+			stable = rhs.stable;
+			machine = rhs.machine;
+			action = std::move(rhs.action);
+		}
 
 		bool operator < (Task const& rhs) const {
 			// Ordering is reversed for priority_queue
@@ -1652,15 +1662,8 @@ public:
 
 			this->currentProcess = t.machine;
 			try {
-				//auto before = getCPUTicks();
 				t.action.send(Void());
 				ASSERT( this->currentProcess == t.machine );
-				/*auto elapsed = getCPUTicks() - before;
-				currentProcess->cpuTicks += elapsed;
-				if (deterministicRandom()->random01() < 0.01){
-					TraceEvent("TaskDuration").detail("CpuTicks", currentProcess->cpuTicks);
-					currentProcess->cpuTicks = 0;
-				}*/
 			} catch (Error& e) {
 				TraceEvent(SevError, "UnhandledSimulationEventError").error(e, true);
 				killProcess(t.machine, KillInstantly);
@@ -1712,6 +1715,8 @@ public:
 
 	//tasks is guarded by ISimulator::mutex
 	std::priority_queue<Task, std::vector<Task>> tasks;
+
+	std::vector<std::function<void()>> stopCallbacks;
 
 	//Sim2Net network;
 	INetwork *net2;

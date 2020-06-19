@@ -131,7 +131,7 @@ namespace oldTLog_4_6 {
 		void push( TLogQueueEntryRef const& qe ) {
 			BinaryWriter wr( Unversioned() );  // outer framing is not versioned
 			wr << uint32_t(0);
-			IncludeVersion().write(wr);  // payload is versioned
+			IncludeVersion(ProtocolVersion::withTLogQueueEntryRef()).write(wr);  // payload is versioned
 			wr << qe;
 			wr << uint8_t(1);
 			*(uint32_t*)wr.getData() = wr.getLength() - sizeof(uint32_t) - sizeof(uint8_t);
@@ -324,17 +324,19 @@ namespace oldTLog_4_6 {
 
 			TagData( Version popped, bool nothing_persistent, bool popped_recently, OldTag tag ) : nothing_persistent(nothing_persistent), popped(popped), popped_recently(popped_recently), update_version_sizes(tag != txsTagOld) {}
 
-			TagData(TagData&& r) BOOST_NOEXCEPT : version_messages(std::move(r.version_messages)), nothing_persistent(r.nothing_persistent), popped_recently(r.popped_recently), popped(r.popped), update_version_sizes(r.update_version_sizes) {}
-			void operator= (TagData&& r) BOOST_NOEXCEPT {
-				version_messages = std::move(r.version_messages);
-				nothing_persistent = r.nothing_persistent;
+		    TagData(TagData&& r) noexcept
+		      : version_messages(std::move(r.version_messages)), nothing_persistent(r.nothing_persistent),
+		        popped_recently(r.popped_recently), popped(r.popped), update_version_sizes(r.update_version_sizes) {}
+		    void operator=(TagData&& r) noexcept {
+			    version_messages = std::move(r.version_messages);
+			    nothing_persistent = r.nothing_persistent;
 				popped_recently = r.popped_recently;
 				popped = r.popped;
 				update_version_sizes = r.update_version_sizes;
-			}
+		    }
 
-			// Erase messages not needed to update *from* versions >= before (thus, messages with toversion <= before)
-			ACTOR Future<Void> eraseMessagesBefore( TagData *self, Version before, int64_t* gBytesErased, Reference<LogData> tlogData, TaskPriority taskID ) {
+		    // Erase messages not needed to update *from* versions >= before (thus, messages with toversion <= before)
+		    ACTOR Future<Void> eraseMessagesBefore( TagData *self, Version before, int64_t* gBytesErased, Reference<LogData> tlogData, TaskPriority taskID ) {
 				while(!self->version_messages.empty() && self->version_messages.front().first < before) {
 					Version version = self->version_messages.front().first;
 					std::pair<int, int> &sizes = tlogData->version_sizes[version];
@@ -414,6 +416,7 @@ namespace oldTLog_4_6 {
 				recoveryCount(), stopped(false), initialized(false), queueCommittingVersion(0), newPersistentDataVersion(invalidVersion), recovery(Void())
 		{
 			startRole(Role::TRANSACTION_LOG, interf.id(), tLogData->workerID, {{"SharedTLog", tLogData->dbgid.shortString()}}, "Restored");
+			addActor.send(traceRole(Role::TRANSACTION_LOG, interf.id()));
 
 			persistentDataVersion.init(LiteralStringRef("TLog.PersistentDataVersion"), cc.id);
 			persistentDataDurableVersion.init(LiteralStringRef("TLog.PersistentDataDurableVersion"), cc.id);

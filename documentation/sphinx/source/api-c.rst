@@ -195,7 +195,7 @@ The FoundationDB client library performs most tasks on a singleton thread (which
 
    Must be called after :func:`fdb_setup_network()` before any asynchronous functions in this API can be expected to complete. Unless your program is entirely event-driven based on results of asynchronous functions in this API and has no event loop of its own, you will want to invoke this function on an auxiliary thread (which it is your responsibility to create).
 
-   This function will not return until :func:`fdb_stop_network()` is called by you or a serious error occurs. You must not invoke :func:`fdb_run_network()` concurrently or reentrantly while it is already running.
+   This function will not return until :func:`fdb_stop_network()` is called by you or a serious error occurs. It is not possible to run more than one network thread, and the network thread cannot be restarted once it has been stopped. This means that once ``fdb_run_network`` has been called, it is not legal to call it again for the lifetime of the running program.
 
 .. function:: fdb_error_t fdb_stop_network()
 
@@ -474,6 +474,11 @@ Applications must provide error handling and an appropriate retry loop around th
    ``snapshot``
       |snapshot|
 
+.. function:: FDBFuture* fdb_transaction_get_estimated_range_size_bytes( FDBTransaction* tr, uint8_t const* begin_key_name, int begin_key_name_length, uint8_t const* end_key_name, int end_key_name_length)
+   Returns an estimated byte size of the key range.
+
+   |future-return0| the estimated size of the key range given. |future-return1| call :func:`fdb_future_get_int64()` to extract the size, |future-return2|
+
 .. function:: FDBFuture* fdb_transaction_get_key(FDBTransaction* transaction, uint8_t const* key_name, int key_name_length, fdb_bool_t or_equal, int offset, fdb_bool_t snapshot)
 
    Resolves a :ref:`key selector <key-selectors>` against the keys in the database snapshot represented by ``transaction``.
@@ -694,8 +699,6 @@ Applications must provide error handling and an appropriate retry loop around th
     |atomic-versionstamps-1|
 
     |atomic-versionstamps-2|
-
-    |atomic-set-versionstamped-key-2|
 
     .. warning :: |atomic-versionstamps-tuple-warning-key|
 

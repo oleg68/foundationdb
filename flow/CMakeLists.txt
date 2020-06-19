@@ -61,12 +61,13 @@ set(FLOW_SRCS
   ThreadSafeQueue.h
   Trace.cpp
   Trace.h
+  TreeBenchmark.h
   UnitTest.cpp
   UnitTest.h
   XmlTraceLogFormatter.cpp
   XmlTraceLogFormatter.h
   actorcompiler.h
-	crc32c.h
+  crc32c.h
   crc32c.cpp
   error_definitions.h
   ${CMAKE_CURRENT_BINARY_DIR}/SourceVersion.h
@@ -78,22 +79,34 @@ set(FLOW_SRCS
   genericactors.actor.h
   network.cpp
   network.h
+  rte_memcpy.h
   serialize.cpp
   serialize.h
   stacktrace.amalgamation.cpp
   stacktrace.h
+  test_memcpy.cpp
+  test_memcpy_perf.cpp
   version.cpp)
+
+if(UNIX AND NOT APPLE)
+  list(APPEND FLOW_SRCS folly_memcpy.S)
+endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SourceVersion.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/SourceVersion.h)
 
 add_flow_target(STATIC_LIBRARY NAME flow SRCS ${FLOW_SRCS})
-target_include_directories(flow SYSTEM PUBLIC ${CMAKE_THREAD_LIBS_INIT})
-target_include_directories(flow PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 if (NOT APPLE AND NOT WIN32)
   set (FLOW_LIBS ${FLOW_LIBS} rt)
 elseif(WIN32)
   target_link_libraries(flow PUBLIC winmm.lib)
   target_link_libraries(flow PUBLIC psapi.lib)
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+  set (FLOW_LIBS ${FLOW_LIBS} execinfo devstat)
+  find_library(EIO eio)
+  if(EIO)
+    target_link_libraries(flow PUBLIC ${EIO})
+  endif()
 endif()
 target_link_libraries(flow PRIVATE ${FLOW_LIBS})
 if(USE_VALGRIND)

@@ -197,12 +197,8 @@ public:
 	};
 
 	void blockUntilReady() {
-		if(isReadyUnsafe()) {
-			ThreadSpinLockHolder holder(mutex);
-			ASSERT(isReadyUnsafe());
-		}
-		else {
-			BlockCallback cb( *this );
+		if (!isReady()) {
+			BlockCallback cb(*this);
 		}
 	}
 
@@ -462,9 +458,7 @@ public:
 	ThreadFuture( const ThreadFuture<T>& rhs ) : sav(rhs.sav) {
 		if (sav) sav->addref();
 	}
-	ThreadFuture(ThreadFuture<T>&& rhs) BOOST_NOEXCEPT : sav(rhs.sav) {
-		rhs.sav = 0;
-	}
+	ThreadFuture(ThreadFuture<T>&& rhs) noexcept : sav(rhs.sav) { rhs.sav = 0; }
 	ThreadFuture( const T& presentValue ) 
 		: sav(new ThreadSingleAssignmentVar<T>())
 	{
@@ -487,7 +481,7 @@ public:
 		if (sav) sav->delref();
 		sav = rhs.sav;
 	}
-	void operator=(ThreadFuture<T>&& rhs) BOOST_NOEXCEPT {
+	void operator=(ThreadFuture<T>&& rhs) noexcept {
 		if (sav != rhs.sav) {
 			if (sav) sav->delref();
 			sav = rhs.sav;

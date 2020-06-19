@@ -28,7 +28,6 @@
 #include "fdbserver/WorkerInterface.actor.h"
 #include "fdbserver/workloads/workloads.actor.h"
 #include "fdbserver/workloads/BulkSetup.actor.h"
-#include "fdbserver/ClusterRecruitmentInterface.h"
 #include "fdbclient/ReadYourWrites.h"
 #include "flow/TDMetric.actor.h"
 #include "flow/actorcompiler.h"  // This must be the last #include.
@@ -227,15 +226,21 @@ struct ReadWriteWorkload : KVWorkload {
 	ACTOR static Future<bool> traceDumpWorkers( Reference<AsyncVar<ServerDBInfo>> db ) {
 		try {
 			loop {
-				ErrorOr<std::vector<WorkerDetails>> workerList = wait( db->get().clusterInterface.getWorkers.tryGetReply( GetWorkersRequest() ) );
-				if( workerList.present() ) {
-					std::vector<Future<ErrorOr<Void>>> dumpRequests;
-					for( int i = 0; i < workerList.get().size(); i++)
-						dumpRequests.push_back( workerList.get()[i].interf.traceBatchDumpRequest.tryGetReply( TraceBatchDumpRequest() ) );
-					wait( waitForAll( dumpRequests ) );
-					return true;
+				choose {
+					when( wait( db->onChange() ) ) {}
+
+					when (ErrorOr<std::vector<WorkerDetails>> workerList = wait( db->get().clusterInterface.getWorkers.tryGetReply( GetWorkersRequest() ) );)
+					{
+						if( workerList.present() ) {
+							std::vector<Future<ErrorOr<Void>>> dumpRequests;
+							for( int i = 0; i < workerList.get().size(); i++)
+								dumpRequests.push_back( workerList.get()[i].interf.traceBatchDumpRequest.tryGetReply( TraceBatchDumpRequest() ) );
+							wait( waitForAll( dumpRequests ) );
+							return true;
+						}
+						wait( delay( 1.0 ) );
+					}
 				}
-				wait( delay( 1.0 ) );
 			}
 		} catch( Error &e ) {
 			TraceEvent(SevError, "FailedToDumpWorkers").error(e);

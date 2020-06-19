@@ -19,7 +19,12 @@
  */
 
 #include <cinttypes>
+#include <vector>
 
+#include "flow/Arena.h"
+#include "fdbclient/FDBOptions.g.h"
+#include "fdbclient/FDBTypes.h"
+#include "fdbclient/ReadYourWrites.h"
 #include "fdbclient/ManagementAPI.actor.h"
 
 #include "fdbclient/SystemData.h"
@@ -84,7 +89,7 @@ std::map<std::string, std::string> configForToken( std::string const& mode ) {
 
 			StatusObject regionObj;
 			regionObj["regions"] = mv;
-			out[p+key] = BinaryWriter::toValue(regionObj, IncludeVersion()).toString();
+			out[p+key] = BinaryWriter::toValue(regionObj, IncludeVersion(ProtocolVersion::withRegionConfiguration())).toString();
 		}
 
 		return out;
@@ -101,6 +106,9 @@ std::map<std::string, std::string> configForToken( std::string const& mode ) {
 	} else if (mode == "ssd-redwood-experimental") {
 		logType = KeyValueStoreType::SSD_BTREE_V2;
 		storeType = KeyValueStoreType::SSD_REDWOOD_V1;
+	} else if (mode == "ssd-rocksdb-experimental") {
+		logType = KeyValueStoreType::SSD_BTREE_V2;
+		storeType = KeyValueStoreType::SSD_ROCKSDB_V1;
 	} else if (mode == "memory" || mode == "memory-2") {
 		logType = KeyValueStoreType::SSD_BTREE_V2;
 		storeType= KeyValueStoreType::MEMORY;
@@ -171,11 +179,11 @@ std::map<std::string, std::string> configForToken( std::string const& mode ) {
 		out[p+"log_replicas"] = log_replicas;
 		out[p+"log_anti_quorum"] = "0";
 
-		BinaryWriter policyWriter(IncludeVersion());
+		BinaryWriter policyWriter(IncludeVersion(ProtocolVersion::withReplicationPolicy()));
 		serializeReplicationPolicy(policyWriter, storagePolicy);
 		out[p+"storage_replication_policy"] = policyWriter.toValue().toString();
 
-		policyWriter = BinaryWriter(IncludeVersion());
+		policyWriter = BinaryWriter(IncludeVersion(ProtocolVersion::withReplicationPolicy()));
 		serializeReplicationPolicy(policyWriter, tLogPolicy);
 		out[p+"log_replication_policy"] = policyWriter.toValue().toString();
 		return out;
@@ -211,7 +219,7 @@ std::map<std::string, std::string> configForToken( std::string const& mode ) {
 	if (remoteRedundancySpecified) {
 		out[p+"remote_log_replicas"] = remote_log_replicas;
 
-		BinaryWriter policyWriter(IncludeVersion());
+		BinaryWriter policyWriter(IncludeVersion(ProtocolVersion::withReplicationPolicy()));
 		serializeReplicationPolicy(policyWriter, remoteTLogPolicy);
 		out[p+"remote_log_policy"] = policyWriter.toValue().toString();
 		return out;
@@ -241,7 +249,7 @@ ConfigurationResult::Type buildConfiguration( std::vector<StringRef> const& mode
 	if(!outConf.count(p + "storage_replication_policy") && outConf.count(p + "storage_replicas")) {
 		int storageCount = stoi(outConf[p + "storage_replicas"]);
 		Reference<IReplicationPolicy> storagePolicy = Reference<IReplicationPolicy>(new PolicyAcross(storageCount, "zoneid", Reference<IReplicationPolicy>(new PolicyOne())));
-		BinaryWriter policyWriter(IncludeVersion());
+		BinaryWriter policyWriter(IncludeVersion(ProtocolVersion::withReplicationPolicy()));
 		serializeReplicationPolicy(policyWriter, storagePolicy);
 		outConf[p+"storage_replication_policy"] = policyWriter.toValue().toString();
 	}
@@ -249,7 +257,7 @@ ConfigurationResult::Type buildConfiguration( std::vector<StringRef> const& mode
 	if(!outConf.count(p + "log_replication_policy") && outConf.count(p + "log_replicas")) {
 		int logCount = stoi(outConf[p + "log_replicas"]);
 		Reference<IReplicationPolicy> logPolicy = Reference<IReplicationPolicy>(new PolicyAcross(logCount, "zoneid", Reference<IReplicationPolicy>(new PolicyOne())));
-		BinaryWriter policyWriter(IncludeVersion());
+		BinaryWriter policyWriter(IncludeVersion(ProtocolVersion::withReplicationPolicy()));
 		serializeReplicationPolicy(policyWriter, logPolicy);
 		outConf[p+"log_replication_policy"] = policyWriter.toValue().toString();
 	}
@@ -1803,6 +1811,26 @@ ACTOR Future<Void> checkDatabaseLock( Reference<ReadYourWritesTransaction> tr, U
 	return Void();
 }
 
+ACTOR Future<Void> advanceVersion(Database cx, Version v) {
+	state Transaction tr(cx);
+	loop {
+		tr.setOption(FDBTransactionOptions::ACCESS_SYSTEM_KEYS);
+		tr.setOption(FDBTransactionOptions::LOCK_AWARE);
+		try {
+			Version rv = wait(tr.getReadVersion());
+			if (rv <= v) {
+				tr.set(minRequiredCommitVersionKey, BinaryWriter::toValue(v + 1, Unversioned()));
+				wait(tr.commit());
+			} else {
+				printf("Current read version is %ld\n", rv);
+				return Void();
+			}
+		} catch (Error& e) {
+			wait(tr.onError(e));
+		}
+	}
+}
+
 ACTOR Future<Void> forceRecovery( Reference<ClusterConnectionFile> clusterFile, Key dcId ) {
 	state Reference<AsyncVar<Optional<ClusterInterface>>> clusterInterface(new AsyncVar<Optional<ClusterInterface>>);
 	state Future<Void> leaderMon = monitorLeader<ClusterInterface>(clusterFile, clusterInterface);
@@ -1836,6 +1864,69 @@ ACTOR Future<Void> waitForPrimaryDC( Database cx, StringRef dcId ) {
 			wait( tr.onError(e) );
 		}
 	}
+}
+
+ACTOR Future<Void> changeCachedRange(Database cx, KeyRangeRef range, bool add) {
+	state ReadYourWritesTransaction tr(cx);
+	state KeyRange sysRange = KeyRangeRef(storageCacheKey(range.begin), storageCacheKey(range.end));
+	state KeyRange sysRangeClear = KeyRangeRef(storageCacheKey(range.begin), keyAfter(storageCacheKey(range.end)));
+	state KeyRange privateRange = KeyRangeRef(cacheKeysKey(0, range.begin), cacheKeysKey(0, range.end));
+	state Value trueValue = storageCacheValue(std::vector<uint16_t>{ 0 });
+	state Value falseValue = storageCacheValue(std::vector<uint16_t>{});
+	loop {
+		tr.setOption(FDBTransactionOptions::LOCK_AWARE);
+		tr.setOption(FDBTransactionOptions::ACCESS_SYSTEM_KEYS);
+		try {
+			tr.clear(sysRangeClear);
+			tr.clear(privateRange);
+			tr.addReadConflictRange(privateRange);
+			Standalone<RangeResultRef> previous =
+			    wait(tr.getRange(KeyRangeRef(storageCachePrefix, sysRange.begin), 1, true));
+			bool prevIsCached = false;
+			if (!previous.empty()) {
+				std::vector<uint16_t> prevVal;
+				decodeStorageCacheValue(previous[0].value, prevVal);
+				prevIsCached = !prevVal.empty();
+			}
+			if (prevIsCached && !add) {
+				// we need to uncache from here
+				tr.set(sysRange.begin, falseValue);
+				tr.set(privateRange.begin, serverKeysFalse);
+			} else if (!prevIsCached && add) {
+				// we need to cache, starting from here
+				tr.set(sysRange.begin, trueValue);
+				tr.set(privateRange.begin, serverKeysTrue);
+			}
+			Standalone<RangeResultRef> after =
+			    wait(tr.getRange(KeyRangeRef(sysRange.end, storageCacheKeys.end), 1, false));
+			bool afterIsCached = false;
+			if (!after.empty()) {
+				std::vector<uint16_t> afterVal;
+				decodeStorageCacheValue(after[0].value, afterVal);
+				afterIsCached = afterVal.empty();
+			}
+			if (afterIsCached && !add) {
+				tr.set(sysRange.end, trueValue);
+				tr.set(privateRange.end, serverKeysTrue);
+			} else if (!afterIsCached && add) {
+				tr.set(sysRange.end, falseValue);
+				tr.set(privateRange.end, serverKeysFalse);
+			}
+			wait(tr.commit());
+			return Void();
+		} catch (Error& e) {
+			state Error err = e;
+			wait(tr.onError(err));
+			TraceEvent(SevDebug, "ChangeCachedRangeError").error(err);
+		}
+	}
+}
+
+Future<Void> addCachedRange(const Database& cx, KeyRangeRef range) {
+	return changeCachedRange(cx, range, true);
+}
+Future<Void> removeCachedRange(const Database& cx, KeyRangeRef range) {
+	return changeCachedRange(cx, range, false);
 }
 
 json_spirit::Value_type normJSONType(json_spirit::Value_type type) {

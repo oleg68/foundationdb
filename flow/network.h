@@ -35,6 +35,7 @@
 
 enum class TaskPriority {
 	Max = 1000000,
+	RunLoop = 30000,
 	ASIOReactor = 20001,
 	RunCycleFunction = 20000,
 	FlushTrace = 10500,
@@ -84,15 +85,18 @@ enum class TaskPriority {
 	MoveKeys = 3550,
 	DataDistributionLaunch = 3530,
 	Ratekeeper = 3510,
-	DataDistribution = 3500,
+	DataDistribution = 3502,
+	DataDistributionLow = 3501,
+	DataDistributionVeryLow = 3500,
 	DiskWrite = 3010,
 	UpdateStorage = 3000,
 	CompactCache = 2900,
 	TLogSpilledPeekReply = 2800,
 	FetchKeys = 2500,
-	RestoreApplierWriteDB = 2400,
-	RestoreApplierReceiveMutations = 2310,
-	RestoreLoaderSendMutations = 2300,
+	RestoreApplierWriteDB = 2310,
+	RestoreApplierReceiveMutations = 2300,
+	RestoreLoaderFinishVersionBatch = 2220,
+	RestoreLoaderSendMutations = 2210,
 	RestoreLoaderLoadFiles = 2200,
 	Low = 2000,
 
@@ -232,6 +236,17 @@ struct NetworkAddress {
 	bool isTLS() const { return (flags & FLAG_TLS) != 0; }
 	bool isV6() const { return ip.isV6(); }
 
+	size_t hash() const {
+		size_t result = 0;
+		if (ip.isV6()) {
+			uint16_t* ptr = (uint16_t*)ip.toV6().data();
+			result = ((size_t)ptr[5] << 32) | ((size_t)ptr[6] << 16) | ptr[7];
+		} else {
+			result = ip.toV4();
+		}
+		return (result << 16) + port;
+	}
+
 	static NetworkAddress parse(std::string const&); // May throw connection_string_invalid
 	static Optional<NetworkAddress> parseOptional(std::string const&);
 	static std::vector<NetworkAddress> parseList( std::string const& );
@@ -267,14 +282,7 @@ namespace std
 	{
 		size_t operator()(const NetworkAddress& na) const
 		{
-			size_t result = 0;
-			if (na.ip.isV6()) {
-				uint16_t* ptr = (uint16_t*)na.ip.toV6().data();
-				result = ((size_t)ptr[5] << 32) | ((size_t)ptr[6] << 16) | ptr[7];
-			} else {
-				result = na.ip.toV4();
-			}
-			return (result << 16) + na.port;
+			return na.hash();
 		}
 	};
 }
@@ -322,18 +330,31 @@ struct NetworkMetrics {
 	enum { SLOW_EVENT_BINS = 16 };
 	uint64_t countSlowEvents[SLOW_EVENT_BINS] = {};
 
-	enum { PRIORITY_BINS = 9 };
-	TaskPriority priorityBins[PRIORITY_BINS] = {};
-	bool priorityBlocked[PRIORITY_BINS] = {};
-	double priorityBlockedDuration[PRIORITY_BINS] = {};
-	double priorityMaxBlockedDuration[PRIORITY_BINS] = {};
-	double priorityTimer[PRIORITY_BINS] = {};
-	double windowedPriorityTimer[PRIORITY_BINS] = {};
-
 	double secSquaredSubmit = 0;
 	double secSquaredDiskStall = 0;
 
-	NetworkMetrics() {}
+	struct PriorityStats {
+		TaskPriority priority;
+
+		bool active = false;
+		double duration = 0;
+		double timer = 0;
+		double windowedTimer = 0;
+		double maxDuration = 0;
+
+		PriorityStats(TaskPriority priority) : priority(priority) {}
+	};
+
+	std::unordered_map<TaskPriority, struct PriorityStats> activeTrackers;
+	std::vector<struct PriorityStats> starvationTrackers;
+
+	static const std::vector<int> starvationBins;
+
+	NetworkMetrics() {
+		for(int priority : starvationBins) {
+			starvationTrackers.emplace_back(static_cast<TaskPriority>(priority));
+		}
+	}
 };
 
 struct BoundedFlowLock;
@@ -370,9 +391,11 @@ public:
 
 	virtual Future<Void> connectHandshake() = 0;
 
+	// Precondition: write() has been called and last returned 0
 	// returns when write() can write at least one byte (or may throw an error if the connection dies)
 	virtual Future<Void> onWritable() = 0;
 
+	// Precondition: read() has been called and last returned 0
 	// returns when read() can read at least one byte (or may throw an error if the connection dies)
 	virtual Future<Void> onReadable() = 0;
 
@@ -469,6 +492,10 @@ public:
 	virtual void stop() = 0;
 	// Terminate the program
 
+	virtual void addStopCallback( std::function<void()> fn ) = 0;
+	// Calls `fn` when stop() is called.
+	// addStopCallback can be called more than once, and each added `fn` will be run once.
+
 	virtual bool isSimulated() const = 0;
 	// Returns true if this network is a local simulation
 
@@ -498,6 +525,9 @@ public:
 
 	virtual bool isAddressOnThisHost( NetworkAddress const& addr ) = 0;
 	// Returns true if it is reasonably certain that a connection to the given address would be a fast loopback connection
+
+	// If the network has not been run and this function has not been previously called, returns true. Otherwise, returns false.
+	virtual bool checkRunnable() = 0;
 
 	// Shorthand for transport().getLocalAddress()
 	static NetworkAddress getLocalAddress()

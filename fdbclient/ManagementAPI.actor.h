@@ -178,6 +178,8 @@ ACTOR Future<Void> unlockDatabase( Database  cx, UID  id );
 ACTOR Future<Void> checkDatabaseLock( Transaction*  tr, UID  id );
 ACTOR Future<Void> checkDatabaseLock( Reference<ReadYourWritesTransaction>  tr, UID  id );
 
+ACTOR Future<Void> advanceVersion(Database cx, Version v);
+
 ACTOR Future<int> setDDMode( Database  cx, int  mode );
 
 ACTOR Future<Void> forceRecovery( Reference<ClusterConnectionFile> clusterFile, Standalone<StringRef> dcId );
@@ -198,6 +200,9 @@ bool schemaMatch( json_spirit::mValue const& schema, json_spirit::mValue const& 
 // execute payload in 'snapCmd' on all the coordinators, TLogs and
 // storage nodes
 ACTOR Future<Void> mgmtSnapCreate(Database cx, Standalone<StringRef> snapCmd, UID snapUID);
+
+Future<Void> addCachedRange(const Database& cx, KeyRangeRef range);
+Future<Void> removeCachedRange(const Database& cx, KeyRangeRef range);
 
 #include "flow/unactorcompiler.h"
 #endif

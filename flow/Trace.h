@@ -71,6 +71,8 @@ public:
 	size_t sizeBytes() const;
 	FieldIterator begin() const;
 	FieldIterator end() const;
+	bool isAnnotated() const;
+	void setAnnotated();
 
 	void addField(const std::string& key, const std::string& value);
 	void addField(std::string&& key, std::string&& value);
@@ -95,6 +97,7 @@ public:
 private:
 	FieldContainer fields;
 	size_t bytes;
+	bool annotated;
 };
 
 template <class Archive>
@@ -144,6 +147,7 @@ private:
 	std::vector<EventInfo> eventBatch;
 	std::vector<AttachInfo> attachBatch;
 	std::vector<BuggifyInfo> buggifyBatch;
+	static bool dumpImmediately();
 };
 
 struct DynamicEventMetric;
@@ -475,6 +479,10 @@ public:
 		return enabled;
 	}
 
+	explicit operator bool() const {
+		return enabled;
+	}
+
 	void log();
 
 	~TraceEvent();  // Actually logs the event
@@ -587,7 +595,8 @@ struct EventCacheHolder : public ReferenceCounted<EventCacheHolder> {
 #endif
 
 struct NetworkAddress;
-void openTraceFile(const NetworkAddress& na, uint64_t rollsize, uint64_t maxLogsSize, std::string directory = ".", std::string baseOfBase = "trace", std::string logGroup = "default");
+void openTraceFile(const NetworkAddress& na, uint64_t rollsize, uint64_t maxLogsSize, std::string directory = ".",
+                   std::string baseOfBase = "trace", std::string logGroup = "default", std::string identifier = "");
 void initTraceEventMetrics();
 void closeTraceFile();
 bool traceFileIsOpen();
@@ -608,6 +617,7 @@ bool validateTraceClockSource(std::string source);
 void addTraceRole(std::string role);
 void removeTraceRole(std::string role);
 void retriveTraceLogIssues(std::set<std::string>& out);
+void setTraceLogGroup(const std::string& role);
 template <class T>
 struct Future;
 struct Void;

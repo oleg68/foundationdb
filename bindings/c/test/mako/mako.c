@@ -12,6 +12,9 @@
 
 #if defined(__linux__)
 #include <linux/limits.h>
+#elif defined(__FreeBSD__)
+#include <sys/stat.h>
+#define CLOCK_MONOTONIC_COARSE CLOCK_MONOTONIC_FAST
 #elif defined(__APPLE__)
 #include <sys/syslimits.h>
 #define CLOCK_MONOTONIC_COARSE CLOCK_MONOTONIC
@@ -1031,6 +1034,9 @@ int parse_transaction(mako_args_t* args, char* optarg) {
 
 	op = 0;
 	while (*ptr) {
+// Clang gives false positive array bounds warning, which must be ignored:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warray-bounds"
 		if (strncmp(ptr, "grv", 3) == 0) {
 			op = OP_GETREADVERSION;
 			ptr += 3;
@@ -1077,6 +1083,7 @@ int parse_transaction(mako_args_t* args, char* optarg) {
 			error = 1;
 			break;
 		}
+#pragma clang diagnostic pop
 
 		/* count */
 		num = 0;

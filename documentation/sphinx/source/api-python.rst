@@ -100,7 +100,7 @@ When you import the ``fdb`` module, it exposes only one useful symbol:
 
 .. warning:: |api-version-multi-version-warning|
 
-For API changes between version 13 and |api-version| (for the purpose of porting older programs), see :doc:`release-notes` and :doc:`api-version-upgrade-guide`.
+For API changes between version 13 and |api-version| (for the purpose of porting older programs), see :ref:`release-notes` and :doc:`api-version-upgrade-guide`.
 
 Opening a database
 ==================
@@ -678,8 +678,6 @@ In each of the methods below, ``param`` should be a string appropriately packed 
 
     |atomic-versionstamps-2|
 
-    |atomic-set-versionstamped-key-2|
-
     .. warning :: |atomic-versionstamps-tuple-warning-key|
 
 .. method:: Transaction.set_versionstamped_value(key, param)
@@ -796,7 +794,21 @@ Most applications should use the read version that FoundationDB determines autom
 
     |infrequent| |transaction-get-versionstamp-blurb|
 
+Transaction misc functions
+--------------------------
+
+.. method:: Transaction.get_estimated_range_size_bytes(begin_key, end_key)
+
+    Get the estimated byte size of the given key range. Returns a :class:`FutureInt64`.
+
 .. _api-python-transaction-options:
+
+Transaction misc functions
+--------------------------
+
+.. method:: Transaction.get_approximate_size()
+
+    |transaction-get-approximate-size-blurb|. Returns a :class:`FutureInt64`.
 
 Transaction options
 -------------------
@@ -822,6 +834,8 @@ Transaction options
     |option-priority-system-immediate-blurb|
 
     .. warning:: |option-priority-system-immediate-warning|
+
+.. _api-python-option-set-causal-read-risky:
 
 .. method:: Transaction.options.set_causal_read_risky
 
@@ -962,9 +976,9 @@ Asynchronous methods return one of the following subclasses of :class:`Future`:
 
     Represents a future string object and responds to the same methods as string in Python. They may be passed to FoundationDB methods that expect a string.
 
-.. class:: FutureVersion
+.. class:: FutureInt64
 
-    Represents a future version (integer). You must call the :meth:`Future.wait()` method on this object to retrieve the version as an integer.
+    Represents a future integer. You must call the :meth:`Future.wait()` method on this object to retrieve the integer.
 
 .. class:: FutureStringArray
 

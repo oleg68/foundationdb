@@ -95,9 +95,9 @@ public:
 	inline explicit Arena( size_t reservedSize );
 	//~Arena();
 	Arena(const Arena&);
-	Arena(Arena && r) BOOST_NOEXCEPT;
+	Arena(Arena&& r) noexcept;
 	Arena& operator=(const Arena&);
-	Arena& operator=(Arena&&) BOOST_NOEXCEPT;
+	Arena& operator=(Arena&&) noexcept;
 
 	inline void dependsOn( const Arena& p );
 	inline size_t getSize() const;
@@ -173,12 +173,12 @@ inline Arena::Arena(size_t reservedSize) : impl( 0 ) {
 		ArenaBlock::create((int)reservedSize,impl);
 }
 inline Arena::Arena( const Arena& r ) : impl( r.impl ) {}
-inline Arena::Arena(Arena && r) BOOST_NOEXCEPT : impl(std::move(r.impl)) {}
+inline Arena::Arena(Arena&& r) noexcept : impl(std::move(r.impl)) {}
 inline Arena& Arena::operator=(const Arena& r) {
 	impl = r.impl;
 	return *this;
 }
-inline Arena& Arena::operator=(Arena&& r) BOOST_NOEXCEPT {
+inline Arena& Arena::operator=(Arena&& r) noexcept {
 	impl = std::move(r.impl);
 	return *this;
 }
@@ -380,12 +380,11 @@ public:
 	}
 #else
 	Standalone( const T& t, const Arena& arena ) : Arena( arena ), T( t ) {}
-	Standalone( const Standalone<T> & t ) : Arena((Arena const&)t), T((T const&)t) {}
-	Standalone<T>& operator=( const Standalone<T> & t ) {
-		*(Arena*)this = (Arena const&)t;
-		*(T*)this = (T const&)t;
-		return *this;
-	}
+	Standalone(const Standalone<T>&) = default;
+	Standalone<T>& operator=(const Standalone<T>&) = default;
+	Standalone(Standalone<T>&&) = default;
+	Standalone<T>& operator=(Standalone<T>&&) = default;
+	~Standalone() = default;
 #endif
 
 	template <class U> Standalone<U> castTo() const {
@@ -496,7 +495,7 @@ public:
 		return substr( 0, size() - s.size() );
 	}
 
-	std::string toString() const { return std::string( (const char*)data, length ); }
+	std::string toString() const { return std::string((const char*)data, length); }
 
 	static bool isPrintable(char c) { return c > 32 && c < 127; }
 	inline std::string printable() const;
@@ -530,11 +529,12 @@ public:
 	int expectedSize() const { return size(); }
 
 	int compare(StringRef const& other) const {
-		if (std::min(size(), other.size()) > 0) {
-			int c = memcmp(begin(), other.begin(), std::min(size(), other.size()));
+		size_t minSize = std::min(size(), other.size());
+		if (minSize != 0) {
+			int c = memcmp(begin(), other.begin(), minSize);
 			if (c != 0) return c;
 		}
-		return size() - other.size();
+		return ::compare(size(), other.size());
 	}
 
 	// Removes bytes from begin up to and including the sep string, returns StringRef of the part before sep
@@ -576,6 +576,12 @@ public:
 		return eatAny(StringRef((const uint8_t *)sep, strlen(sep)), foundSeparator);
 	}
 
+	// Copies string contents to dst and returns a pointer to the next byte after
+	uint8_t * copyTo(uint8_t *dst) const {
+		memcpy(dst, data, length);
+		return dst + length;
+	}
+
 private:
 	// Unimplemented; blocks conversion through std::string
 	StringRef( char* );
@@ -585,7 +591,17 @@ private:
 };
 #pragma pack( pop )
 
-template<>
+namespace std {
+	template <>
+	struct hash<StringRef> {
+		static constexpr std::hash<std::string_view> hashFunc{};
+		std::size_t operator()(StringRef const& tag) const {
+			return hashFunc(std::string_view((const char*)tag.begin(), tag.size()));
+		}
+	};
+}
+
+template <>
 struct TraceableString<StringRef> {
 	static const char* begin(StringRef value) {
 		return reinterpret_cast<const char*>(value.begin());
@@ -693,15 +709,20 @@ inline bool operator != (const StringRef& lhs, const StringRef& rhs ) { return !
 inline bool operator <= ( const StringRef& lhs, const StringRef& rhs ) { return !(lhs>rhs); }
 inline bool operator >= ( const StringRef& lhs, const StringRef& rhs ) { return !(lhs<rhs); }
 
-// This trait is used by VectorRef to determine if it should just memcpy the vector contents.
-// FIXME:  VectorRef really should use std::is_trivially_copyable for this BUT that is not implemented
-// in gcc c++0x so instead we will use this custom trait which defaults to std::is_trivial, which
-// handles most situations but others will have to be specialized.
+// This trait is used by VectorRef to determine if deep copy constructor should recursively
+// call deep copies of each element.
+//
+// TODO: There should be an easier way to identify the difference between flow_ref and non-flow_ref types.
+// std::is_trivially_copyable does not work because some flow_ref types are trivially copyable
+// and some non-flow_ref types are not trivially copyable.
 template <typename T>
-struct memcpy_able : std::is_trivial<T> {};
+struct flow_ref : std::integral_constant<bool, !std::is_fundamental_v<T>> {};
 
 template <>
-struct memcpy_able<UID> : std::integral_constant<bool, true> {};
+struct flow_ref<UID> : std::integral_constant<bool, false> {};
+
+template <class A, class B>
+struct flow_ref<std::pair<A, B>> : std::integral_constant<bool, false> {};
 
 template<class T>
 struct string_serialized_traits : std::false_type {
@@ -777,7 +798,7 @@ public:
 	using value_type = T;
 	static_assert(SerStrategy == VecSerStrategy::FlatBuffers || string_serialized_traits<T>::value);
 
-	// T must be trivially destructible (and copyable)!
+	// T must be trivially destructible!
 	VectorRef() : data(0), m_size(0), m_capacity(0) {}
 
 	template <VecSerStrategy S>
@@ -792,19 +813,19 @@ public:
 		return *this;
 	}
 
-	// Arena constructor for non-Ref types, identified by memcpy_able
+	// Arena constructor for non-Ref types, identified by !flow_ref
 	template <class T2 = T, VecSerStrategy S>
-	VectorRef(Arena& p, const VectorRef<T, S>& toCopy, typename std::enable_if<memcpy_able<T2>::value, int>::type = 0)
+	VectorRef(Arena& p, const VectorRef<T, S>& toCopy, typename std::enable_if<!flow_ref<T2>::value, int>::type = 0)
 	  : VPS(toCopy), data((T*)new (p) uint8_t[sizeof(T) * toCopy.size()]), m_size(toCopy.size()),
 	    m_capacity(toCopy.size()) {
 		if (m_size > 0) {
-			memcpy(data, toCopy.data, m_size * sizeof(T));
+			std::copy(toCopy.data, toCopy.data + m_size, data);
 		}
 	}
 
 	// Arena constructor for Ref types, which must have an Arena constructor
 	template <class T2 = T, VecSerStrategy S>
-	VectorRef(Arena& p, const VectorRef<T, S>& toCopy, typename std::enable_if<!memcpy_able<T2>::value, int>::type = 0)
+	VectorRef(Arena& p, const VectorRef<T, S>& toCopy, typename std::enable_if<flow_ref<T2>::value, int>::type = 0)
 	  : VPS(), data((T*)new (p) uint8_t[sizeof(T) * toCopy.size()]), m_size(toCopy.size()), m_capacity(toCopy.size()) {
 		for (int i = 0; i < m_size; i++) {
 			auto ptr = new (&data[i]) T(p, toCopy[i]);
@@ -838,6 +859,12 @@ public:
 	int size() const { return m_size; }
 	bool empty() const { return m_size == 0; }
 	const T& operator[](int i) const { return data[i]; }
+
+	// const versions of some VectorRef operators
+	const T* cbegin() const { return data; }
+	const T* cend() const { return data + m_size; }
+	T const& cfront() const { return *begin(); }
+	T const& cback() const { return end()[-1]; }
 
 	std::reverse_iterator<const T*> rbegin() const { return std::reverse_iterator<const T*>(end()); }
 	std::reverse_iterator<const T*> rend() const { return std::reverse_iterator<const T*>(begin()); }
@@ -894,7 +921,7 @@ public:
 		if (m_size + count > m_capacity) reallocate(p, m_size + count);
 		VPS::invalidate();
 		if (count > 0) {
-			memcpy(data + m_size, begin, sizeof(T) * count);
+			std::copy(begin, begin + count, data + m_size);
 		}
 		m_size += count;
 	}
@@ -934,15 +961,15 @@ public:
 		if (size > m_capacity) reallocate(p, size);
 	}
 
-	// expectedSize() for non-Ref types, identified by memcpy_able
+	// expectedSize() for non-Ref types, identified by !flow_ref
 	template <class T2 = T>
-	typename std::enable_if<memcpy_able<T2>::value, size_t>::type expectedSize() const {
+	typename std::enable_if<!flow_ref<T2>::value, size_t>::type expectedSize() const {
 		return sizeof(T) * m_size;
 	}
 
 	// expectedSize() for Ref types, which must in turn have expectedSize() implemented.
 	template <class T2 = T>
-	typename std::enable_if<!memcpy_able<T2>::value, size_t>::type expectedSize() const {
+	typename std::enable_if<flow_ref<T2>::value, size_t>::type expectedSize() const {
 		size_t t = sizeof(T) * m_size;
 		for (int i = 0; i < m_size; i++) t += data[i].expectedSize();
 		return t;
@@ -959,9 +986,9 @@ private:
 	void reallocate(Arena& p, int requiredCapacity) {
 		requiredCapacity = std::max(m_capacity * 2, requiredCapacity);
 		// SOMEDAY: Maybe we are right at the end of the arena and can expand cheaply
-		T* newData = (T*)new (p) uint8_t[requiredCapacity * sizeof(T)];
+		T* newData = new (p) T[requiredCapacity];
 		if (m_size > 0) {
-			memcpy(newData, data, m_size * sizeof(T));
+			std::move(data, data + m_size, newData);
 		}
 		data = newData;
 		m_capacity = requiredCapacity;

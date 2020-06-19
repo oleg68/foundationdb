@@ -268,6 +268,8 @@ StatusObject DatabaseConfiguration::toJSON(bool noPolicies) const {
 			result["storage_engine"] = "ssd-2";
 		} else if( tLogDataStoreType == KeyValueStoreType::SSD_BTREE_V2 && storageServerStoreType == KeyValueStoreType::SSD_REDWOOD_V1 ) {
 			result["storage_engine"] = "ssd-redwood-experimental";
+		} else if (tLogDataStoreType == KeyValueStoreType::SSD_BTREE_V2 && storageServerStoreType == KeyValueStoreType::SSD_ROCKSDB_V1) {
+			result["storage_engine"] = "ssd-rocksdb-experimental";
 		} else if( tLogDataStoreType == KeyValueStoreType::MEMORY && storageServerStoreType == KeyValueStoreType::MEMORY ) {
 			result["storage_engine"] = "memory-1";
 		} else if( tLogDataStoreType == KeyValueStoreType::SSD_BTREE_V2 && storageServerStoreType == KeyValueStoreType::MEMORY_RADIXTREE ) {
@@ -494,11 +496,16 @@ Optional<ValueRef> DatabaseConfiguration::get( KeyRef key ) const {
 	}
 }
 
-bool DatabaseConfiguration::isExcludedServer( NetworkAddress a ) const {
-	return get( encodeExcludedServersKey( AddressExclusion(a.ip, a.port) ) ).present() ||
-		get( encodeExcludedServersKey( AddressExclusion(a.ip) ) ).present() ||
-		get( encodeFailedServersKey( AddressExclusion(a.ip, a.port) ) ).present() ||
-		get( encodeFailedServersKey( AddressExclusion(a.ip) ) ).present();
+bool DatabaseConfiguration::isExcludedServer( NetworkAddressList a ) const {
+	return get( encodeExcludedServersKey( AddressExclusion(a.address.ip, a.address.port) ) ).present() ||
+		get( encodeExcludedServersKey( AddressExclusion(a.address.ip) ) ).present() ||
+		get( encodeFailedServersKey( AddressExclusion(a.address.ip, a.address.port) ) ).present() ||
+		get( encodeFailedServersKey( AddressExclusion(a.address.ip) ) ).present() ||
+		( a.secondaryAddress.present() && (
+		get( encodeExcludedServersKey( AddressExclusion(a.secondaryAddress.get().ip, a.secondaryAddress.get().port) ) ).present() ||
+		get( encodeExcludedServersKey( AddressExclusion(a.secondaryAddress.get().ip) ) ).present() ||
+		get( encodeFailedServersKey( AddressExclusion(a.secondaryAddress.get().ip, a.secondaryAddress.get().port) ) ).present() ||
+		get( encodeFailedServersKey( AddressExclusion(a.secondaryAddress.get().ip) ) ).present() ) );
 }
 std::set<AddressExclusion> DatabaseConfiguration::getExcludedServers() const {
 	const_cast<DatabaseConfiguration*>(this)->makeConfigurationImmutable();

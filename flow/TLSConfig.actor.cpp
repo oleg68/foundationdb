@@ -25,6 +25,32 @@
 // To force typeinfo to only be emitted once.
 TLSPolicy::~TLSPolicy() {}
 
+namespace TLS {
+
+void DisableOpenSSLAtExitHandler() {
+#ifdef TLS_DISABLED
+	return;
+#else
+	static bool once = false;
+	if (!once) {
+		once = true;
+		int success = OPENSSL_init_crypto(OPENSSL_INIT_NO_ATEXIT, nullptr);
+		if (!success) {
+			throw tls_error();
+		}
+	}
+#endif
+}
+
+void DestroyOpenSSLGlobalState() {
+#ifdef TLS_DISABLED
+	return;
+#else
+	OPENSSL_cleanup();
+#endif
+}
+
+} // namespace TLS
 #ifdef TLS_DISABLED
 
 void LoadedTLSConfig::print(FILE *fp) {
@@ -261,7 +287,7 @@ ACTOR static Future<Void> readEntireFile( std::string filename, std::string* des
 		throw file_too_large();
 	}
 	destination->resize(filesize);
-	wait(success(file->read(const_cast<char*>(destination->c_str()), filesize, 0)));
+	wait(success(file->read(&((*destination)[0]), filesize, 0)));
 	return Void();
 }
 
@@ -287,7 +313,7 @@ ACTOR Future<LoadedTLSConfig> TLSConfig::loadAsync(const TLSConfig* self) {
 	if (CAPath.size()) {
 		reads.push_back( readEntireFile( CAPath, &loaded.tlsCABytes ) );
 	} else {
-		loaded.tlsCABytes = self->tlsKeyBytes;
+		loaded.tlsCABytes = self->tlsCABytes;
 	}
 
 	wait(waitForAll(reads));

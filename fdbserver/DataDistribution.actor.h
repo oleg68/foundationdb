@@ -25,7 +25,6 @@
 #define FDBSERVER_DATA_DISTRIBUTION_ACTOR_H
 
 #include "fdbclient/NativeAPI.actor.h"
-#include "fdbserver/ClusterRecruitmentInterface.h"
 #include "fdbserver/MoveKeys.actor.h"
 #include "fdbserver/LogSystem.h"
 #include "flow/actorcompiler.h" // This must be the last #include.
@@ -106,6 +105,15 @@ struct GetMetricsRequest {
 
 	GetMetricsRequest() {}
 	GetMetricsRequest( KeyRange const& keys ) : keys(keys) {}
+};
+
+struct GetMetricsListRequest {
+	KeyRange keys;
+	int shardLimit;
+	Promise<Standalone<VectorRef<DDMetricsRef>>> reply;
+
+	GetMetricsListRequest() {}
+	GetMetricsListRequest( KeyRange const& keys, const int shardLimit ) : keys(keys), shardLimit(shardLimit) {}
 };
 
 struct TeamCollectionInterface {
@@ -204,6 +212,7 @@ Future<Void> dataDistributionTracker(
 	PromiseStream<RelocateShard> const& output,
 	Reference<ShardsAffectedByTeamFailure> const& shardsAffectedByTeamFailure,
 	PromiseStream<GetMetricsRequest> const& getShardMetrics,
+	PromiseStream<GetMetricsListRequest> const& getShardMetricsList,
 	FutureStream<Promise<int64_t>> const& getAverageShardBytes,
 	Promise<Void> const& readyToStart,
 	Reference<AsyncVar<bool>> const& zeroHealthyTeams,

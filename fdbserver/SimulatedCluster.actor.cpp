@@ -25,16 +25,13 @@
 #include "fdbserver/WorkerInterface.actor.h"
 #include "fdbclient/ClusterInterface.h"
 #include "fdbserver/Knobs.h"
-#include "fdbserver/ClusterRecruitmentInterface.h"
 #include "fdbserver/CoordinationInterface.h"
 #include "fdbmonitor/SimpleIni.h"
 #include "fdbrpc/AsyncFileNonDurable.actor.h"
 #include "fdbclient/ManagementAPI.actor.h"
 #include "fdbclient/NativeAPI.actor.h"
 #include "fdbclient/BackupAgent.actor.h"
-#if defined(CMAKE_BUILD) || !defined(WIN32)
-#include "versions.h"
-#endif
+#include "fdbclient/versions.h"
 #include "flow/actorcompiler.h"  // This must be the last #include.
 
 #undef max
@@ -737,7 +734,7 @@ void SimulationConfig::generateNormalConfig(int minimumReplication, int minimumR
 	if (deterministicRandom()->random01() < 0.25) db.desiredTLogCount = deterministicRandom()->randomInt(1,7);
 	if (deterministicRandom()->random01() < 0.25) db.masterProxyCount = deterministicRandom()->randomInt(1,7);
 	if (deterministicRandom()->random01() < 0.25) db.resolverCount = deterministicRandom()->randomInt(1,7);
-	int storage_engine_type = deterministicRandom()->randomInt(0, 3);
+	int storage_engine_type = deterministicRandom()->randomInt(0, 4);
 	switch (storage_engine_type) {
 	case 0: {
 		TEST(true); // Simulated cluster using ssd storage engine
@@ -754,6 +751,11 @@ void SimulationConfig::generateNormalConfig(int minimumReplication, int minimumR
 		set_config("memory-radixtree-beta");
 		break;
 	}
+	case 3: {
+		TEST(true); // Simulated cluster using radix-tree storage engine
+		set_config("ssd-redwood-experimental");
+		break;
+		}
 	default:
 		ASSERT(false); // Programmer forgot to adjust cases.
 	}
@@ -816,12 +818,15 @@ void SimulationConfig::generateNormalConfig(int minimumReplication, int minimumR
 		set_config(format("log_spill:=%d", logSpill));
 		int logVersion = deterministicRandom()->randomInt( TLogVersion::MIN_RECRUITABLE, TLogVersion::MAX_SUPPORTED+1 );
 		set_config(format("log_version:=%d", logVersion));
-		set_config("backup_worker_enabled:=1");
 	} else {
 		if (deterministicRandom()->random01() < 0.7)
 			set_config(format("log_version:=%d", TLogVersion::MAX_SUPPORTED));
 		if (deterministicRandom()->random01() < 0.5)
 			set_config(format("log_spill:=%d", TLogSpillType::DEFAULT));
+	}
+
+	if (deterministicRandom()->random01() < 0.5) {
+		set_config("backup_worker_enabled:=1");
 	}
 
 	if(generateFearless || (datacenters == 2 && deterministicRandom()->random01() < 0.5)) {
@@ -1215,9 +1220,9 @@ void setupSimulatedSystem(vector<Future<Void>>* systemActors, std::string baseFo
 
 		//FIXME: temporarily code to test storage cache
 		//TODO: caching disabled for this merge
-		//if(dc==0) {
-		//	machines++;
-		//}
+		if(dc==0) {
+			machines++;
+		}
 
 		int useSeedForMachine = deterministicRandom()->randomInt(0, machines);
 		Standalone<StringRef> zoneId;
@@ -1244,10 +1249,10 @@ void setupSimulatedSystem(vector<Future<Void>>* systemActors, std::string baseFo
 
 			//FIXME: temporarily code to test storage cache
 			//TODO: caching disabled for this merge
-			//if(machine==machines-1 && dc==0) {
-			//	processClass = ProcessClass(ProcessClass::StorageCacheClass, ProcessClass::CommandLineSource);
-			//	nonVersatileMachines++;
-			//}
+			if(machine==machines-1 && dc==0) {
+				processClass = ProcessClass(ProcessClass::StorageCacheClass, ProcessClass::CommandLineSource);
+				nonVersatileMachines++;
+			}
 
 			std::vector<IPAddress> ips;
 			for (int i = 0; i < processesPerMachine; i++) {

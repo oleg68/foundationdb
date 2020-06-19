@@ -91,10 +91,6 @@ namespace HTTP {
 	// Returns the number of bytes read.
 	ACTOR Future<int> read_into_string(Reference<IConnection> conn, std::string *buf, int maxlen) {
 		loop {
-			// Wait for connection to have something to read
-			wait(conn->onReadable());
-			wait( delay( 0, TaskPriority::ReadSocket ) );
-
 			// Read into buffer
 			int originalSize = buf->size();
 			// TODO:  resize is zero-initializing the space we're about to overwrite, so do something else, which probably means
@@ -107,6 +103,10 @@ namespace HTTP {
 			// Make sure data was actually read, it's possible for there to be none.
 			if(len > 0)
 				return len;
+
+			// Wait for connection to have something to read
+			wait(conn->onReadable());
+			wait( delay( 0, TaskPriority::ReadSocket ) );
 		}
 	}
 

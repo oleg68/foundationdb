@@ -33,6 +33,7 @@
 #include "fdbclient/CoordinationInterface.h"
 #include "fdbclient/ClusterInterface.h"
 #include "fdbclient/ClientLogEvents.h"
+#include "fdbclient/KeyRangeMap.h"
 #include "flow/actorcompiler.h" // has to be last include
 
 // CLIENT_BUGGIFY should be used to randomly introduce failures at run time (like BUGGIFY but for client side testing)
@@ -58,9 +59,10 @@ struct NetworkOptions {
 	std::string traceLogGroup;
 	std::string traceFormat;
 	std::string traceClockSource;
+	std::string traceFileIdentifier;
 	Optional<bool> logClientInfo;
 	Reference<ReferencedObject<Standalone<VectorRef<ClientVersionRef>>>> supportedVersions;
-	bool slowTaskProfilingEnabled;
+	bool runLoopProfilingEnabled;
 
 	NetworkOptions();
 };
@@ -75,8 +77,8 @@ public:
 	Database() {}  // an uninitialized database can be destructed or reassigned safely; that's it
 	void operator= ( Database const& rhs ) { db = rhs.db; }
 	Database( Database const& rhs ) : db(rhs.db) {}
-	Database(Database&& r) BOOST_NOEXCEPT : db(std::move(r.db)) {}
-	void operator= (Database&& r) BOOST_NOEXCEPT { db = std::move(r.db); }
+	Database(Database&& r) noexcept : db(std::move(r.db)) {}
+	void operator=(Database&& r) noexcept { db = std::move(r.db); }
 
 	// For internal use by the native client:
 	explicit Database(Reference<DatabaseContext> cx) : db(cx) {}
@@ -128,17 +130,33 @@ struct TransactionOptions {
 	bool readOnly : 1;
 	bool firstInBatch : 1;
 	bool includePort : 1;
+	bool reportConflictingKeys : 1;
+
+	TransactionPriority priority;
+
+	TagSet tags; // All tags set on transaction
+	TagSet readTags; // Tags that can be sent with read requests
+
+	// update clear function if you add a new field
 
 	TransactionOptions(Database const& cx);
 	TransactionOptions();
 
 	void reset(Database const& cx);
+
+private:
+	void clear();
 };
 
+class ReadYourWritesTransaction; // workaround cyclic dependency
 struct TransactionInfo {
 	Optional<UID> debugID;
 	TaskPriority taskID;
 	bool useProvisionalProxies;
+	// Used to save conflicting keys if FDBTransactionOptions::REPORT_CONFLICTING_KEYS is enabled
+	// prefix/<key1> : '1' - any keys equal or larger than this key are (probably) conflicting keys
+	// prefix/<key2> : '0' - any keys equal or larger than this key are (definitely) not conflicting keys
+	std::shared_ptr<CoalescedKeyRangeMap<Value>> conflictingKeys;
 
 	explicit TransactionInfo( TaskPriority taskID ) : taskID(taskID), useProvisionalProxies(false) {}
 };
@@ -243,6 +261,7 @@ public:
 	// Pass a negative value for `shardLimit` to indicate no limit on the shard number.
 	Future< StorageMetrics > getStorageMetrics( KeyRange const& keys, int shardLimit );
 	Future< Standalone<VectorRef<KeyRef>> > splitStorageMetrics( KeyRange const& keys, StorageMetrics const& limit, StorageMetrics const& estimated );
+	Future<Standalone<VectorRef<KeyRangeRef>>> getReadHotRanges(KeyRange const& keys);
 
 	// If checkWriteConflictRanges is true, existing write conflict ranges will be searched for this key
 	void set( const KeyRef& key, const ValueRef& value, bool addConflictRange = true );
@@ -265,7 +284,7 @@ public:
 
 	// These are to permit use as state variables in actors:
 	Transaction() : info( TaskPriority::DefaultEndpoint ) {}
-	void operator=(Transaction&& r) BOOST_NOEXCEPT;
+	void operator=(Transaction&& r) noexcept;
 
 	void reset();
 	void fullReset();
@@ -292,10 +311,17 @@ public:
 	TransactionOptions options;
 	double startTime;
 	Reference<TransactionLogInfo> trLogInfo;
+
+	const vector<Future<std::pair<Key, Key>>>& getExtraReadConflictRanges() const { return extraConflictRanges; }
+	Standalone<VectorRef<KeyRangeRef>> readConflictRanges() const {
+		return Standalone<VectorRef<KeyRangeRef>>(tr.transaction.read_conflict_ranges, tr.arena);
+	}
+	Standalone<VectorRef<KeyRangeRef>> writeConflictRanges() const {
+		return Standalone<VectorRef<KeyRangeRef>>(tr.transaction.write_conflict_ranges, tr.arena);
+	}
+
 private:
 	Future<Version> getReadVersion(uint32_t flags);
-	void setPriority(uint32_t priorityFlag);
-
 	Database cx;
 
 	double backoff;
@@ -309,6 +335,8 @@ private:
 };
 
 ACTOR Future<Version> waitForCommittedVersion(Database cx, Version version);
+ACTOR Future<Standalone<VectorRef<DDMetricsRef>>> waitDataDistributionMetricsList(Database cx, KeyRange keys,
+                                                                               int shardLimit);
 
 std::string unprintable( const std::string& );
 

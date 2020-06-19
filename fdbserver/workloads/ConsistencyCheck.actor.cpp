@@ -446,6 +446,7 @@ struct ConsistencyCheckWorkload : TestWorkload
 					req.limit = SERVER_KNOBS->MOVE_KEYS_KRM_LIMIT;
 					req.limitBytes = SERVER_KNOBS->MOVE_KEYS_KRM_LIMIT_BYTES;
 					req.version = version;
+					req.tags = TagSet();
 
 					//Try getting the shard locations from the key servers
 					state vector<Future<ErrorOr<GetKeyValuesReply>>> keyValueFutures;
@@ -667,7 +668,9 @@ struct ConsistencyCheckWorkload : TestWorkload
 			tr.setOption(FDBTransactionOptions::LOCK_AWARE);
 			state int bytesReadInRange = 0;
 
-			decodeKeyServersValue(keyLocations[shard].value, sourceStorageServers, destStorageServers);
+			Standalone<RangeResultRef> UIDtoTagMap = wait( tr.getRange( serverTagKeys, CLIENT_KNOBS->TOO_MANY ) );
+			ASSERT( !UIDtoTagMap.more && UIDtoTagMap.size() < CLIENT_KNOBS->TOO_MANY );
+			decodeKeyServersValue(UIDtoTagMap, keyLocations[shard].value, sourceStorageServers, destStorageServers, false);
 
 			//If the destStorageServers is non-empty, then this shard is being relocated
 			state bool isRelocating = destStorageServers.size() > 0;
@@ -705,6 +708,7 @@ struct ConsistencyCheckWorkload : TestWorkload
 			state vector<UID> storageServers = (isRelocating) ? destStorageServers : sourceStorageServers;
 			state vector<StorageServerInterface> storageServerInterfaces;
 
+			//TraceEvent("ConsistencyCheck_GetStorageInfo").detail("StorageServers", storageServers.size());
 			loop {
 				try {
 					vector< Future< Optional<Value> > > serverListEntries;
@@ -717,6 +721,7 @@ struct ConsistencyCheckWorkload : TestWorkload
 						else if (self->performQuiescentChecks)
 							self->testFailure("/FF/serverList changing in a quiescent database");
 					}
+
 					break;
 				}
 				catch(Error &e) {
@@ -777,6 +782,7 @@ struct ConsistencyCheckWorkload : TestWorkload
 						req.limit = 1e4;
 						req.limitBytes = CLIENT_KNOBS->REPLY_BYTE_LIMIT;
 						req.version = version;
+						req.tags = TagSet();
 
 						//Try getting the entries in the specified range
 						state vector<Future<ErrorOr<GetKeyValuesReply>>> keyValueFutures;
@@ -913,7 +919,7 @@ struct ConsistencyCheckWorkload : TestWorkload
 							else if(!isRelocating)
 							{
 								TraceEvent("ConsistencyCheck_StorageServerUnavailable").suppressFor(1.0).detail("StorageServer", storageServers[j]).detail("ShardBegin", printable(range.begin)).detail("ShardEnd", printable(range.end))
-									.detail("Address", storageServerInterfaces[j].address()).detail("GetKeyValuesToken", storageServerInterfaces[j].getKeyValues.getEndpoint().token);
+									.detail("Address", storageServerInterfaces[j].address()).detail("UID", storageServerInterfaces[j].id()).detail("GetKeyValuesToken", storageServerInterfaces[j].getKeyValues.getEndpoint().token);
 
 								//All shards should be available in quiscence
 								if(self->performQuiescentChecks)
@@ -1139,12 +1145,12 @@ struct ConsistencyCheckWorkload : TestWorkload
 		std::set<Optional<Key>> missingStorage;
 
 		for( int i = 0; i < workers.size(); i++ ) {
-			NetworkAddress addr = workers[i].interf.tLog.getEndpoint().addresses.getTLSAddress();
-			if( !configuration.isExcludedServer(addr) &&
+			NetworkAddress addr = workers[i].interf.stableAddress();
+			if( !configuration.isExcludedServer(workers[i].interf.addresses()) &&
 				( workers[i].processClass == ProcessClass::StorageClass || workers[i].processClass == ProcessClass::UnsetClass ) ) {
 				bool found = false;
 				for( int j = 0; j < storageServers.size(); j++ ) {
-					if( storageServers[j].getValue.getEndpoint().addresses.getTLSAddress() == addr ) {
+					if( storageServers[j].stableAddress() == addr ) {
 						found = true;
 						break;
 					}
@@ -1478,8 +1484,8 @@ struct ConsistencyCheckWorkload : TestWorkload
 							TraceEvent("ConsistencyCheck_LogRouterNotInNonExcludedWorkers").detail("Id", logRouter.id());
 							return false;
 						}
-						if (logRouter.interf().locality.dcId() != expectedRemoteDcId) {
-							TraceEvent("ConsistencyCheck_LogRouterNotBestDC").detail("expectedDC", getOptionalString(expectedRemoteDcId)).detail("ActualDC", getOptionalString(logRouter.interf().locality.dcId()));
+						if (logRouter.interf().filteredLocality.dcId() != expectedRemoteDcId) {
+							TraceEvent("ConsistencyCheck_LogRouterNotBestDC").detail("expectedDC", getOptionalString(expectedRemoteDcId)).detail("ActualDC", getOptionalString(logRouter.interf().filteredLocality.dcId()));
 							return false;
 						}
 					}

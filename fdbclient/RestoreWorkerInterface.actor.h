@@ -93,6 +93,7 @@ struct RestoreWorkerInterface {
 		interfID = deterministicRandom()->randomUniqueID();
 	}
 
+	//To change this serialization, ProtocolVersion::RestoreWorkerInterfaceValue must be updated, and downgrades need to be considered
 	template <class Ar>
 	void serialize(Ar& ar) {
 		serializer(ar, interfID, heartbeat, recruitRole, terminateWorker);
@@ -145,12 +146,13 @@ struct RestoreLoaderInterface : RestoreRoleInterface {
 	NetworkAddress address() const { return heartbeat.getEndpoint().addresses.address; }
 
 	void initEndpoints() {
+		// Endpoint in a later restore phase has higher priority
 		heartbeat.getEndpoint(TaskPriority::LoadBalancedEndpoint);
 		updateRestoreSysInfo.getEndpoint(TaskPriority::LoadBalancedEndpoint);
-		loadFile.getEndpoint(TaskPriority::LoadBalancedEndpoint);
-		sendMutations.getEndpoint(TaskPriority::LoadBalancedEndpoint);
 		initVersionBatch.getEndpoint(TaskPriority::LoadBalancedEndpoint);
-		finishVersionBatch.getEndpoint(TaskPriority::LoadBalancedEndpoint);
+		loadFile.getEndpoint(TaskPriority::RestoreLoaderLoadFiles);
+		sendMutations.getEndpoint(TaskPriority::RestoreLoaderSendMutations);
+		finishVersionBatch.getEndpoint(TaskPriority::RestoreLoaderFinishVersionBatch);
 		collectRestoreRoleInterfaces.getEndpoint(TaskPriority::LoadBalancedEndpoint);
 		finishRestore.getEndpoint(TaskPriority::LoadBalancedEndpoint);
 	}
@@ -183,9 +185,10 @@ struct RestoreApplierInterface : RestoreRoleInterface {
 	NetworkAddress address() const { return heartbeat.getEndpoint().addresses.address; }
 
 	void initEndpoints() {
+		// Endpoint in a later restore phase has higher priority
 		heartbeat.getEndpoint(TaskPriority::LoadBalancedEndpoint);
-		sendMutationVector.getEndpoint(TaskPriority::LoadBalancedEndpoint);
-		applyToDB.getEndpoint(TaskPriority::LoadBalancedEndpoint);
+		sendMutationVector.getEndpoint(TaskPriority::RestoreApplierReceiveMutations);
+		applyToDB.getEndpoint(TaskPriority::RestoreApplierWriteDB);
 		initVersionBatch.getEndpoint(TaskPriority::LoadBalancedEndpoint);
 		collectRestoreRoleInterfaces.getEndpoint(TaskPriority::LoadBalancedEndpoint);
 		finishRestore.getEndpoint(TaskPriority::LoadBalancedEndpoint);
@@ -209,6 +212,8 @@ struct RestoreAsset {
 	KeyRange range; // Only use mutations in range
 
 	int fileIndex;
+	// Partition ID for mutation log files, which is also encoded in the filename of mutation logs.
+	int partitionId = -1;
 	std::string filename;
 	int64_t offset;
 	int64_t len;
@@ -218,12 +223,12 @@ struct RestoreAsset {
 	RestoreAsset() = default;
 
 	bool operator==(const RestoreAsset& r) const {
-		return fileIndex == r.fileIndex && filename == r.filename && offset == r.offset && len == r.len &&
-		       beginVersion == r.beginVersion && endVersion == r.endVersion && range == r.range;
+		return beginVersion == r.beginVersion && endVersion == r.endVersion && range == r.range &&
+		       fileIndex == r.fileIndex && partitionId == r.partitionId && filename == r.filename &&
+		       offset == r.offset && len == r.len;
 	}
 	bool operator!=(const RestoreAsset& r) const {
-		return fileIndex != r.fileIndex || filename != r.filename || offset != r.offset || len != r.len ||
-		       beginVersion != r.beginVersion || endVersion != r.endVersion || range != r.range;
+		return !(*this == r);
 	}
 	bool operator<(const RestoreAsset& r) const {
 		return std::make_tuple(fileIndex, filename, offset, len, beginVersion, endVersion, range.begin, range.end) <
@@ -233,20 +238,30 @@ struct RestoreAsset {
 
 	template <class Ar>
 	void serialize(Ar& ar) {
-		serializer(ar, beginVersion, endVersion, range, filename, fileIndex, offset, len, uid);
+		serializer(ar, beginVersion, endVersion, range, filename, fileIndex, partitionId, offset, len, uid);
 	}
 
 	std::string toString() {
 		std::stringstream ss;
 		ss << "UID:" << uid.toString() << " begin:" << beginVersion << " end:" << endVersion
 		   << " range:" << range.toString() << " filename:" << filename << " fileIndex:" << fileIndex
-		   << " offset:" << offset << " len:" << len;
+		   << " partitionId:" << partitionId << " offset:" << offset << " len:" << len;
 		return ss.str();
 	}
 
 	// RestoreAsset and VersionBatch both use endVersion as exclusive in version range
 	bool isInVersionRange(Version commitVersion) const {
 		return commitVersion >= beginVersion && commitVersion < endVersion;
+	}
+
+	// Is mutation's begin and end keys are in RestoreAsset's range
+	bool isInKeyRange(MutationRef mutation) const {
+		if (isRangeMutation(mutation)) {
+			// Range mutation's right side is exclusive
+			return mutation.param1 >= range.begin && mutation.param2 <= range.end;
+		} else {
+			return mutation.param1 >= range.begin && mutation.param1 < range.end;
+		}
 	}
 };
 
@@ -267,6 +282,10 @@ struct LoadingParam {
 	bool operator!=(const LoadingParam& r) const { return isRangeFile != r.isRangeFile || asset != r.asset; }
 	bool operator<(const LoadingParam& r) const {
 		return (isRangeFile < r.isRangeFile) || (isRangeFile == r.isRangeFile && asset < r.asset);
+	}
+
+	bool isPartitionedLog() const {
+		return !isRangeFile && asset.partitionId >= 0;
 	}
 
 	template <class Ar>
@@ -346,20 +365,24 @@ struct RestoreSysInfoRequest : TimedRequest {
 	constexpr static FileIdentifier file_identifier = 75960741;
 
 	RestoreSysInfo sysInfo;
+	Standalone<VectorRef<std::pair<KeyRangeRef, Version>>> rangeVersions;
 
 	ReplyPromise<RestoreCommonReply> reply;
 
 	RestoreSysInfoRequest() = default;
-	explicit RestoreSysInfoRequest(RestoreSysInfo sysInfo) : sysInfo(sysInfo) {}
+	explicit RestoreSysInfoRequest(RestoreSysInfo sysInfo,
+	                               Standalone<VectorRef<std::pair<KeyRangeRef, Version>>> rangeVersions)
+	  : sysInfo(sysInfo), rangeVersions(rangeVersions) {}
 
 	template <class Ar>
 	void serialize(Ar& ar) {
-		serializer(ar, sysInfo, reply);
+		serializer(ar, sysInfo, rangeVersions, reply);
 	}
 
 	std::string toString() {
 		std::stringstream ss;
-		ss << "RestoreSysInfoRequest";
+		ss << "RestoreSysInfoRequest "
+		   << "rangeVersions.size:" << rangeVersions.size();
 		return ss.str();
 	}
 };
@@ -444,29 +467,28 @@ struct RestoreSendVersionedMutationsRequest : TimedRequest {
 	int batchIndex; // version batch index
 	RestoreAsset asset; // Unique identifier for the current restore asset
 
-	Version prevVersion, version; // version is the commitVersion of the mutation vector.
+	Version msgIndex; // Monitonically increasing index of mutation messages
 	bool isRangeFile;
-	MutationsVec mutations; // All mutations at the same version parsed by one loader
+	VersionedMutationsVec versionedMutations; // Versioned mutations may be at different versions parsed by one loader
 
 	ReplyPromise<RestoreCommonReply> reply;
 
 	RestoreSendVersionedMutationsRequest() = default;
-	explicit RestoreSendVersionedMutationsRequest(int batchIndex, const RestoreAsset& asset, Version prevVersion,
-	                                              Version version, bool isRangeFile, MutationsVec mutations)
-	  : batchIndex(batchIndex), asset(asset), prevVersion(prevVersion), version(version), isRangeFile(isRangeFile),
-	    mutations(mutations) {}
+	explicit RestoreSendVersionedMutationsRequest(int batchIndex, const RestoreAsset& asset, Version msgIndex,
+	                                              bool isRangeFile, VersionedMutationsVec versionedMutations)
+	  : batchIndex(batchIndex), asset(asset), msgIndex(msgIndex), isRangeFile(isRangeFile),
+	    versionedMutations(versionedMutations) {}
 
 	std::string toString() {
 		std::stringstream ss;
-		ss << "VersionBatchIndex:" << batchIndex << "RestoreAsset:" << asset.toString()
-		   << " prevVersion:" << prevVersion << " version:" << version << " isRangeFile:" << isRangeFile
-		   << " mutations.size:" << mutations.size();
+		ss << "VersionBatchIndex:" << batchIndex << "RestoreAsset:" << asset.toString() << " msgIndex:" << msgIndex
+		   << " isRangeFile:" << isRangeFile << " versionedMutations.size:" << versionedMutations.size();
 		return ss.str();
 	}
 
 	template <class Ar>
 	void serialize(Ar& ar) {
-		serializer(ar, batchIndex, asset, prevVersion, version, isRangeFile, mutations, reply);
+		serializer(ar, batchIndex, asset, msgIndex, isRangeFile, versionedMutations, reply);
 	}
 };
 
@@ -521,42 +543,28 @@ struct RestoreRequest {
 	int index;
 	Key tagName;
 	Key url;
-	bool waitForComplete;
 	Version targetVersion;
-	bool verbose;
 	KeyRange range;
-	Key addPrefix;
-	Key removePrefix;
-	bool lockDB;
 	UID randomUid;
-
-	std::vector<int> restoreRequests;
-	// Key restoreTag;
 
 	ReplyPromise<struct RestoreCommonReply> reply;
 
 	RestoreRequest() = default;
-	explicit RestoreRequest(const int index, const Key& tagName, const Key& url, bool waitForComplete,
-	                        Version targetVersion, bool verbose, const KeyRange& range, const Key& addPrefix,
-	                        const Key& removePrefix, bool lockDB, const UID& randomUid)
-	  : index(index), tagName(tagName), url(url), waitForComplete(waitForComplete), targetVersion(targetVersion),
-	    verbose(verbose), range(range), addPrefix(addPrefix), removePrefix(removePrefix), lockDB(lockDB),
-	    randomUid(randomUid) {}
+	explicit RestoreRequest(const int index, const Key& tagName, const Key& url, Version targetVersion,
+	                        const KeyRange& range, const UID& randomUid)
+	  : index(index), tagName(tagName), url(url), targetVersion(targetVersion), range(range), randomUid(randomUid) {}
 
+	//To change this serialization, ProtocolVersion::RestoreRequestValue must be updated, and downgrades need to be considered
 	template <class Ar>
 	void serialize(Ar& ar) {
-		serializer(ar, index, tagName, url, waitForComplete, targetVersion, verbose, range, addPrefix, removePrefix,
-		           lockDB, randomUid, restoreRequests, reply);
+		serializer(ar, index, tagName, url, targetVersion, range, randomUid, reply);
 	}
 
 	std::string toString() const {
 		std::stringstream ss;
 		ss << "index:" << std::to_string(index) << " tagName:" << tagName.contents().toString()
-		   << " url:" << url.contents().toString() << " waitForComplete:" << std::to_string(waitForComplete)
-		   << " targetVersion:" << std::to_string(targetVersion) << " verbose:" << std::to_string(verbose)
-		   << " range:" << range.toString() << " addPrefix:" << addPrefix.contents().toString()
-		   << " removePrefix:" << removePrefix.contents().toString() << " lockDB:" << std::to_string(lockDB)
-		   << " randomUid:" << randomUid.toString();
+		   << " url:" << url.contents().toString() << " targetVersion:" << std::to_string(targetVersion)
+		   << " range:" << range.toString() << " randomUid:" << randomUid.toString();
 		return ss.str();
 	}
 };

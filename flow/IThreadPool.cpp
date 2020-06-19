@@ -73,12 +73,12 @@ class ThreadPool : public IThreadPool, public ReferenceCounted<ThreadPool> {
 		void operator()() { Thread::dispatch(action); action = NULL; }
 		~ActionWrapper() { if (action) { action->cancel(); } }
 	private:
-		void operator=(ActionWrapper const&);
+		ActionWrapper &operator=(ActionWrapper const&);
 	};
 public:
 	ThreadPool() : dontstop(ios), mode(Run) {}
 	~ThreadPool() {}
-	Future<Void> stop() {
+	Future<Void> stop(Error const& e = success()) {
 		if (mode == Shutdown) return Void();
 		ReferenceCounted<ThreadPool>::addref();
 		ios.stop(); // doesn't work?

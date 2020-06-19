@@ -132,9 +132,6 @@
 .. |atomic-set-versionstamped-key-1| replace::
     Transforms ``key`` using a versionstamp for the transaction. This key must be at least 14 bytes long. The final 4 bytes will be interpreted as a 32-bit little-endian integer denoting an index into the key at which to perform the transformation, and then trimmed off the key. The 10 bytes in the key beginning at the index will be overwritten with the versionstamp. If the index plus 10 bytes points past the end of the key, the result will be an error. Sets the transformed key in the database to ``param``.
 
-.. |atomic-set-versionstamped-key-2| replace::
-    This operation is not compatible with |read-your-writes-disable-option| and will generate an error if used with it.
-
 .. |atomic-set-versionstamped-value| replace::
     Transforms ``param`` using a versionstamp for the transaction. This parameter must be at least 14 bytes long. The final 4 bytes will be interpreted as a 32-bit little-endian integer denoting an index into the parameter at which to perform the transformation, and then trimmed off the key. The 10 bytes in the parameter beginning at the index will be overwritten with the versionstamp. If the index plus 10 bytes points past the end of the parameter, the result will be an error. Sets ``key`` in the database to the transformed parameter.
 
@@ -175,6 +172,9 @@
 
 .. |transaction-get-committed-version-blurb| replace::
     Gets the version number at which a successful commit modified the database. This must be called only after the successful (non-error) completion of a call to |commit-func| on this Transaction, or the behavior is undefined. Read-only transactions do not modify the database when committed and will have a committed version of -1. Keep in mind that a transaction which reads keys and then sets them to their current values may be optimized to a read-only transaction.
+
+.. |transaction-get-approximate-size-blurb| replace::
+    Gets the the approximate transaction size so far, which is the summation of the estimated size of mutations, read conflict ranges, and write conflict ranges.
 
 .. |transaction-get-versionstamp-blurb| replace::
     Returns a future which will contain the versionstamp which was used by any versionstamp operations in this transaction. This function must be called before a call to |commit-func| on this Transaction. The future will be ready only after the successful completion of a call to |commit-func| on this Transaction. Read-only transactions do not modify the database when committed and will result in the future completing with an error. Keep in mind that a transaction which reads keys and then sets them to their current values may be optimized to a read-only transaction.

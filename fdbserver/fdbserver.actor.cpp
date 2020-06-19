@@ -34,7 +34,6 @@
 #include "fdbserver/CoordinationInterface.h"
 #include "fdbserver/WorkerInterface.actor.h"
 #include "fdbclient/RestoreWorkerInterface.actor.h"
-#include "fdbserver/ClusterRecruitmentInterface.h"
 #include "fdbserver/ServerDBInfo.h"
 #include "fdbserver/MoveKeys.actor.h"
 #include "fdbserver/ConflictSet.h"
@@ -55,13 +54,11 @@
 #include "fdbrpc/AsyncFileCached.actor.h"
 #include "fdbserver/CoroFlow.h"
 #include "flow/TLSConfig.actor.h"
-#if defined(CMAKE_BUILD) || !defined(WIN32)
-#include "versions.h"
-#endif
+#include "fdbclient/versions.h"
 
 #include "fdbmonitor/SimpleIni.h"
 
-#ifdef  __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
 #include <execinfo.h>
 #include <signal.h>
 #ifdef ALLOC_INSTRUMENTATION
@@ -76,6 +73,7 @@
 #endif
 
 #include "flow/SimpleOpt.h"
+#include <fstream>
 #include "flow/actorcompiler.h"  // This must be the last #include.
 
 // clang-format off
@@ -198,63 +196,6 @@ bool enableFailures = true;
 
 #define test_assert(x) if (!(x)) { cout << "Test failed: " #x << endl; return false; }
 
-vector< Standalone<VectorRef<DebugEntryRef>> > debugEntries;
-int64_t totalDebugEntriesSize = 0;
-
-#if CENABLED(0, NOT_IN_CLEAN)
-StringRef debugKey = LiteralStringRef( "" );
-StringRef debugKey2 = LiteralStringRef( "\xff\xff\xff\xff" );
-
-bool debugMutation( const char* context, Version version, MutationRef const& mutation ) {
-	if ((mutation.type == mutation.SetValue || mutation.type == mutation.AddValue || mutation.type==mutation.DebugKey) && (mutation.param1 == debugKey || mutation.param1 == debugKey2))
-		;//TraceEvent("MutationTracking").detail("At", context).detail("Version", version).detail("MutationType", "SetValue").detail("Key", mutation.param1).detail("Value", mutation.param2);
-	else if ((mutation.type == mutation.ClearRange || mutation.type == mutation.DebugKeyRange) && ((mutation.param1<=debugKey && mutation.param2>debugKey) || (mutation.param1<=debugKey2 && mutation.param2>debugKey2)))
-		;//TraceEvent("MutationTracking").detail("At", context).detail("Version", version).detail("MutationType", "ClearRange").detail("KeyBegin", mutation.param1).detail("KeyEnd", mutation.param2);
-	else
-		return false;
-	const char* type =
-		mutation.type == MutationRef::SetValue ? "SetValue" :
-		mutation.type == MutationRef::ClearRange ? "ClearRange" :
-		mutation.type == MutationRef::AddValue ? "AddValue" :
-		mutation.type == MutationRef::DebugKeyRange ? "DebugKeyRange" :
-		mutation.type == MutationRef::DebugKey ? "DebugKey" :
-		"UnknownMutation";
-	printf("DEBUGMUTATION:\t%.6f\t%s\t%s\t%lld\t%s\t%s\t%s\n", now(), g_network->getLocalAddress().toString().c_str(), context, version, type, printable(mutation.param1).c_str(), printable(mutation.param2).c_str());
-
-	return true;
-}
-
-bool debugKeyRange( const char* context, Version version, KeyRangeRef const& keys ) {
-	if (keys.contains(debugKey) || keys.contains(debugKey2)) {
-		debugMutation(context, version, MutationRef(MutationRef::DebugKeyRange, keys.begin, keys.end) );
-		//TraceEvent("MutationTracking").detail("At", context).detail("Version", version).detail("KeyBegin", keys.begin).detail("KeyEnd", keys.end);
-		return true;
-	} else
-		return false;
-}
-
-#elif CENABLED(0, NOT_IN_CLEAN)
-bool debugMutation( const char* context, Version version, MutationRef const& mutation ) {
-	if (!debugEntries.size() || debugEntries.back().size() >= 1000) {
-		if (debugEntries.size()) totalDebugEntriesSize += debugEntries.back().arena().getSize() + sizeof(debugEntries.back());
-		debugEntries.push_back(Standalone<VectorRef<DebugEntryRef>>());
-		TraceEvent("DebugMutationBuffer").detail("Bytes", totalDebugEntriesSize);
-	}
-	auto& v = debugEntries.back();
-	v.push_back_deep( v.arena(), DebugEntryRef(context, version, mutation) );
-
-	return false;	// No auxiliary logging
-}
-
-bool debugKeyRange( const char* context, Version version, KeyRangeRef const& keys ) {
-	return debugMutation( context, version, MutationRef(MutationRef::DebugKeyRange, keys.begin, keys.end) );
-}
-
-#else // Default implementation.
-bool debugMutation( const char* context, Version version, MutationRef const& mutation ) { return false; }
-bool debugKeyRange( const char* context, Version version, KeyRangeRef const& keys ) { return false; }
-#endif
-
 #ifdef _WIN32
 #include <sddl.h>
 
@@ -292,7 +233,7 @@ public:
 			throw platform_error();
 		}
 		permission.set_permissions( &sa );
-#elif (defined(__linux__) || defined(__APPLE__))
+#elif (defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__))
 		// There is nothing to do here, since the default permissions are fine
 #else
 		#error Port me!
@@ -302,7 +243,7 @@ public:
 	virtual ~WorldReadablePermissions() {
 #ifdef _WIN32
 		LocalFree( sa.lpSecurityDescriptor );
-#elif (defined(__linux__) || defined(__APPLE__))
+#elif (defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__))
 		// There is nothing to do here, since the default permissions are fine
 #else
 		#error Port me!
@@ -943,7 +884,7 @@ struct CLIOptions {
 	double fileIoTimeout = 0.0;
 	bool fileIoWarnOnly = false;
 	uint64_t rsssize = -1;
-	std::vector<std::string> blobCredentials; // used for fast restore workers
+	std::vector<std::string> blobCredentials; // used for fast restore workers & backup workers
 	const char* blobCredsFromENV = nullptr;
 
 	Reference<ClusterConnectionFile> connectionFile;
@@ -1554,9 +1495,9 @@ int main(int argc, char* argv[]) {
 		delete FLOW_KNOBS;
 		delete SERVER_KNOBS;
 		delete CLIENT_KNOBS;
-		FlowKnobs* flowKnobs = new FlowKnobs(true, role == Simulation);
-		ClientKnobs* clientKnobs = new ClientKnobs(true);
-		ServerKnobs* serverKnobs = new ServerKnobs(true, clientKnobs, role == Simulation);
+		FlowKnobs* flowKnobs = new FlowKnobs;
+		ClientKnobs* clientKnobs = new ClientKnobs;
+		ServerKnobs* serverKnobs = new ServerKnobs;
 		FLOW_KNOBS = flowKnobs;
 		SERVER_KNOBS = serverKnobs;
 		CLIENT_KNOBS = clientKnobs;
@@ -1587,6 +1528,11 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		if (!serverKnobs->setKnob("server_mem_limit", std::to_string(opts.memLimit))) ASSERT(false);
+
+		// Reinitialize knobs in order to update knobs that are dependent on explicitly set knobs
+		flowKnobs->initialize(true, role == Simulation);
+		clientKnobs->initialize(true);
+		serverKnobs->initialize(true, clientKnobs, role == Simulation);
 
 		// evictionPolicyStringToEnum will throw an exception if the string is not recognized as a valid
 		EvictablePageCache::evictionPolicyStringToEnum(flowKnobs->CACHE_EVICTION_POLICY);
@@ -1624,6 +1570,7 @@ int main(int argc, char* argv[]) {
 			openTraceFile(NetworkAddress(), opts.rollsize, opts.maxLogsSize, opts.logFolder, "trace", opts.logGroup);
 		} else {
 			g_network = newNet2(opts.tlsConfig, opts.useThreadPool, true);
+			g_network->addStopCallback( Net2FileSystem::stop );
 			FlowTransport::createInstance(false, 1);
 
 			const bool expectsPublicAddress = (role == FDBD || role == NetworkTestServer || role == Restore);
@@ -1842,6 +1789,16 @@ int main(int argc, char* argv[]) {
 			setupAndRun(dataFolder, opts.testFile, opts.restarting, (isRestoring >= 1), opts.whitelistBinPaths);
 			g_simulator.run();
 		} else if (role == FDBD) {
+			// Update the global blob credential files list so that both fast
+			// restore workers and backup workers can access blob storage.
+			std::vector<std::string>* pFiles =
+			    (std::vector<std::string>*)g_network->global(INetwork::enBlobCredentialFiles);
+			if (pFiles != nullptr) {
+				for (auto& f : opts.blobCredentials) {
+					pFiles->push_back(f);
+				}
+			}
+
 			// Call fast restore for the class FastRestoreClass. This is a short-cut to run fast restore in circus
 			if (opts.processClass == ProcessClass::FastRestoreClass) {
 				printf("Run as fast restore worker\n");
@@ -1850,25 +1807,16 @@ int main(int argc, char* argv[]) {
 				if (!dataFolder.size())
 					dataFolder = format("fdb/%d/", opts.publicAddresses.address.port); // SOMEDAY: Better default
 
-				// Update the global blob credential files list
-				std::vector<std::string>* pFiles =
-				    (std::vector<std::string>*)g_network->global(INetwork::enBlobCredentialFiles);
-				if (pFiles != nullptr) {
-					for (auto& f : opts.blobCredentials) {
-						pFiles->push_back(f);
-					}
-				}
-
 				vector<Future<Void>> actors(listenErrors.begin(), listenErrors.end());
 				actors.push_back(restoreWorker(opts.connectionFile, opts.localities, dataFolder));
 				f = stopAfter(waitForAll(actors));
-				printf("Fast restore worker exits\n");
+				printf("Fast restore worker started\n");
 				g_network->run();
 				printf("g_network->run() done\n");
 			} else { // Call fdbd roles in conventional way
 				ASSERT(opts.connectionFile);
 
-				setupSlowTaskProfiler();
+				setupRunLoopProfiler();
 
 				auto dataFolder = opts.dataFolder;
 				if (!dataFolder.size())
@@ -1894,7 +1842,7 @@ int main(int argc, char* argv[]) {
 			                       opts.localities));
 			g_network->run();
 		} else if (role == ConsistencyCheck) {
-			setupSlowTaskProfiler();
+			setupRunLoopProfiler();
 
 			auto m = startSystemMonitor(opts.dataFolder, opts.zoneId, opts.zoneId);
 			f = stopAfter(runTests(opts.connectionFile, TEST_TYPE_CONSISTENCY_CHECK, TEST_HERE, 1, opts.testFile,
@@ -1974,20 +1922,6 @@ int main(int argc, char* argv[]) {
 			cout << "  " << i->second << " " << i->first << endl;*/
 		//	cout << "  " << Actor::allActors[i]->getName() << endl;
 
-		int total = 0;
-		for(auto i = Error::errorCounts().begin(); i != Error::errorCounts().end(); ++i)
-			total += i->second;
-		if (total)
-			printf("%d errors:\n", total);
-		for(auto i = Error::errorCounts().begin(); i != Error::errorCounts().end(); ++i)
-			if (i->second > 0)
-				printf("  %d: %d %s\n", i->second, i->first, Error::fromCode(i->first).what());
-
-		if (&g_simulator == g_network) {
-			auto processes = g_simulator.getAllProcesses();
-			for(auto i = processes.begin(); i != processes.end(); ++i)
-				printf("%s %s: %0.3f Mclocks\n", (*i)->name, (*i)->address.toString().c_str(), (*i)->cpuTicks / 1e6);
-		}
 		if (role == Simulation) {
 			unsigned long sevErrorEventsLogged = TraceEvent::CountEventsLoggedAt(SevError);
 			if (sevErrorEventsLogged > 0) {
