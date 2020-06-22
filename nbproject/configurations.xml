@@ -99,7 +99,9 @@
           <in>MultiVersionTransaction.actor.g.cpp</in>
           <in>NativeAPI.actor.g.cpp</in>
           <in>ReadYourWrites.actor.g.cpp</in>
+          <in>SpecialKeySpace.actor.g.cpp</in>
           <in>StatusClient.actor.g.cpp</in>
+          <in>TagThrottle.actor.g.cpp</in>
           <in>TaskBucket.actor.g.cpp</in>
           <in>ThreadSafeTransaction.actor.g.cpp</in>
         </df>
@@ -110,6 +112,7 @@
           <in>FailureMonitor.actor.g.cpp</in>
           <in>FlowTests.actor.g.cpp</in>
           <in>FlowTransport.actor.g.cpp</in>
+          <in>HealthMonitor.actor.g.cpp</in>
           <in>IAsyncFile.actor.g.cpp</in>
           <in>dsltest.actor.g.cpp</in>
           <in>genericactors.actor.g.cpp</in>
@@ -133,6 +136,7 @@
             <in>BackupToDBCorrectness.actor.g.cpp</in>
             <in>BackupToDBUpgrade.actor.g.cpp</in>
             <in>BulkLoad.actor.g.cpp</in>
+            <in>Cache.actor.g.cpp</in>
             <in>ChangeConfig.actor.g.cpp</in>
             <in>ClientTransactionProfileCorrectness.actor.g.cpp</in>
             <in>CommitBugCheck.actor.g.cpp</in>
@@ -144,6 +148,7 @@
             <in>DDBalance.actor.g.cpp</in>
             <in>DDMetrics.actor.g.cpp</in>
             <in>DDMetricsExclude.actor.g.cpp</in>
+            <in>DataDistributionMetrics.actor.g.cpp</in>
             <in>DifferentClustersSameRV.actor.g.cpp</in>
             <in>DiskDurability.actor.g.cpp</in>
             <in>DiskDurabilityTest.actor.g.cpp</in>
@@ -168,6 +173,7 @@
             <in>ParallelRestore.actor.g.cpp</in>
             <in>Performance.actor.g.cpp</in>
             <in>Ping.actor.g.cpp</in>
+            <in>PopulateTPCC.actor.g.cpp</in>
             <in>PubSubMultiples.actor.g.cpp</in>
             <in>QueuePush.actor.g.cpp</in>
             <in>RYWDisable.actor.g.cpp</in>
@@ -175,8 +181,10 @@
             <in>RandomClogging.actor.g.cpp</in>
             <in>RandomMoveKeys.actor.g.cpp</in>
             <in>RandomSelector.actor.g.cpp</in>
+            <in>ReadHotDetection.actor.g.cpp</in>
             <in>ReadWrite.actor.g.cpp</in>
             <in>RemoveServersSafely.actor.g.cpp</in>
+            <in>ReportConflictingKeys.actor.g.cpp</in>
             <in>Rollback.actor.g.cpp</in>
             <in>RyowCorrectness.actor.g.cpp</in>
             <in>SaveAndKill.actor.g.cpp</in>
@@ -185,10 +193,13 @@
             <in>Sideband.actor.g.cpp</in>
             <in>SlowTaskWorkload.actor.g.cpp</in>
             <in>SnapTest.actor.g.cpp</in>
+            <in>SpecialKeySpaceCorrectness.actor.g.cpp</in>
             <in>StatusWorkload.actor.g.cpp</in>
             <in>Storefront.actor.g.cpp</in>
             <in>StreamingRead.actor.g.cpp</in>
             <in>SuspendProcesses.actor.g.cpp</in>
+            <in>TPCC.actor.g.cpp</in>
+            <in>TagThrottleApi.actor.g.cpp</in>
             <in>TargetedKill.actor.g.cpp</in>
             <in>TaskBucketCorrectness.actor.g.cpp</in>
             <in>ThreadSafety.actor.g.cpp</in>
@@ -219,6 +230,7 @@
           <in>FDBExecHelper.actor.g.cpp</in>
           <in>KeyValueStoreCompressTestData.actor.g.cpp</in>
           <in>KeyValueStoreMemory.actor.g.cpp</in>
+          <in>KeyValueStoreRocksDB.actor.g.cpp</in>
           <in>KeyValueStoreSQLite.actor.g.cpp</in>
           <in>LeaderElection.actor.g.cpp</in>
           <in>LogRouter.actor.g.cpp</in>
@@ -332,6 +344,7 @@
         <in>TaskBucket.actor.cpp</in>
         <in>ThreadSafeTransaction.actor.cpp</in>
         <in>Tuple.cpp</in>
+        <in>VersionedMap.cpp</in>
         <in>zipf.c</in>
       </df>
       <df name="FDBLibTLS">
@@ -513,6 +526,7 @@
         <in>LogSystemPeekCursor.actor.cpp</in>
         <in>MasterProxyServer.actor.cpp</in>
         <in>MoveKeys.actor.cpp</in>
+        <in>MutationTracking.cpp</in>
         <in>OldTLogServer_4_6.actor.cpp</in>
         <in>OldTLogServer_6_0.actor.cpp</in>
         <in>OldTLogServer_6_2.actor.cpp</in>
@@ -584,6 +598,8 @@
         <in>network.cpp</in>
         <in>serialize.cpp</in>
         <in>stacktrace.amalgamation.cpp</in>
+        <in>test_memcpy.cpp</in>
+        <in>test_memcpy_perf.cpp</in>
         <in>version.cpp</in>
       </df>
     </df>
@@ -616,9 +632,9 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0" commonFlags="-O2 -fPIC -fPIC -std=gnu++17"/>
-        <element flagsID="1" commonFlags="-O2 -fPIC -std=gnu++17"/>
-        <element flagsID="2" commonFlags="-O2 -ggdb -fPIC"/>
+        <element flagsID="0" commonFlags="-O2 -fPIC -mavx -fPIC -std=gnu++17"/>
+        <element flagsID="1" commonFlags="-O2 -ggdb -mavx -fPIC -std=gnu11"/>
+        <element flagsID="2" commonFlags="-O2 -mavx -fPIC -std=gnu++17"/>
         <element flagsID="3" commonFlags="-std=c++14"/>
       </flagsDictionary>
       <codeAssistance>
@@ -686,24 +702,27 @@
           </preprocessorList>
         </ccTool>
       </item>
-      <item path="bindings/c/test/mako/mako.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="bindings/c/test/mako/mako.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="bindings/c/test/mako/utils.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="bindings/c/test/mako/utils.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="bindings/c/test/performance_test.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="bindings/c/test/performance_test.c"
+            ex="false"
+            tool="0"
+            flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="bindings/c/test/ryw_benchmark.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="bindings/c/test/ryw_benchmark.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="bindings/c/test/txn_size_test.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="bindings/c/test/txn_size_test.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="bindings/c/test/workloads/SimpleWorkload.cpp"
@@ -731,22 +750,18 @@
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>bindings/flow</pElem>
             <pElem>bld/bindings/flow</pElem>
+            <pElem>bindings/flow</pElem>
+            <pElem>bindings/flow/tester</pElem>
+            <pElem>bld/bindings/flow/tester</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -772,22 +787,18 @@
         </ccTool>
       </item>
       <item path="bindings/flow/Subspace.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>bindings/flow</pElem>
             <pElem>bld/bindings/flow</pElem>
+            <pElem>bindings/flow</pElem>
+            <pElem>bindings/flow/tester</pElem>
+            <pElem>bld/bindings/flow/tester</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -802,22 +813,18 @@
         </ccTool>
       </item>
       <item path="bindings/flow/Tuple.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>bindings/flow</pElem>
             <pElem>bld/bindings/flow</pElem>
+            <pElem>bindings/flow</pElem>
+            <pElem>bindings/flow/tester</pElem>
+            <pElem>bld/bindings/flow/tester</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -891,1279 +898,1307 @@
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
-          <incDir>
-            <pElem>bindings/flow</pElem>
-            <pElem>bld/bindings/flow</pElem>
-            <pElem>bld/bindings/c</pElem>
-            <pElem>bindings/c</pElem>
-            <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
-          </incDir>
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/bindings/flow/HighContentionAllocator.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
-          <incDir>
-            <pElem>bindings/flow</pElem>
-            <pElem>bld/bindings/flow</pElem>
-            <pElem>bld/bindings/c</pElem>
-            <pElem>bindings/c</pElem>
-            <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
-          </incDir>
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/bindings/flow/Node.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
-          <incDir>
-            <pElem>bindings/flow</pElem>
-            <pElem>bld/bindings/flow</pElem>
-            <pElem>bld/bindings/c</pElem>
-            <pElem>bindings/c</pElem>
-            <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
-          </incDir>
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/bindings/flow/fdb_flow.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
-          <incDir>
-            <pElem>bindings/flow</pElem>
-            <pElem>bld/bindings/flow</pElem>
-            <pElem>bld/bindings/c</pElem>
-            <pElem>bindings/c</pElem>
-            <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
-          </incDir>
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/bindings/flow/tester/DirectoryTester.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/bindings/flow/tester/Tester.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/documentation/tutorial/tutorial.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbbackup/FileConverter.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbbackup/FileDecoder.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbbackup/backup.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbcli/FlowLineNoise.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbcli/fdbcli.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/AsyncFileBlobStore.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/BackupAgentBase.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/BackupContainer.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/BlobStore.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/DatabaseBackupAgent.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/FDBOptions.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/FileBackupAgent.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/HTTP.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/KeyRangeMap.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/ManagementAPI.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/MetricLogger.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/MonitorLeader.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/MultiVersionTransaction.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/NativeAPI.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/ReadYourWrites.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbclient/SpecialKeySpace.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/StatusClient.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbclient/TagThrottle.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/TaskBucket.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbclient/ThreadSafeTransaction.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/ActorFuzz.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/AsyncFileCached.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/AsyncFileNonDurable.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/FailureMonitor.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/FlowTests.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/FlowTransport.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbrpc/HealthMonitor.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/IAsyncFile.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/dsltest.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/genericactors.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbrpc/sim2.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/BackupProgress.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/BackupWorker.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/ClusterController.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/CoordinatedState.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/Coordination.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/CoroFlow.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/DataDistribution.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/DataDistributionQueue.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/DataDistributionTracker.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/DiskQueue.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/FDBExecHelper.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/KeyValueStoreCompressTestData.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/KeyValueStoreMemory.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/KeyValueStoreRocksDB.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/KeyValueStoreSQLite.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/LeaderElection.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/LogRouter.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/LogSystemDiskQueueAdapter.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/LogSystemPeekCursor.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/MasterProxyServer.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/MoveKeys.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/OldTLogServer_4_6.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/OldTLogServer_6_0.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/OldTLogServer_6_2.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/QuietDatabase.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/Ratekeeper.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/Resolver.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/RestoreApplier.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/RestoreCommon.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/RestoreLoader.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/RestoreMaster.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/RestoreRoleCommon.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/RestoreUtil.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/RestoreWorker.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/SimulatedCluster.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/Status.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/StorageCache.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/TLogServer.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/TagPartitionedLogSystem.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/VersionedBTree.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/WaitFailure.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/fdbserver.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/masterserver.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/networktest.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/pubsub.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/storageserver.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/tester.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/worker.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ApiCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ApiWorkload.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/AsyncFileCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/AsyncFileRead.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/AsyncFileWrite.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/AtomicOps.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/AtomicOpsApiCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/AtomicRestore.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/AtomicSwitchover.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/BackgroundSelectors.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/BackupAndParallelRestoreCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/BackupCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/BackupToDBAbort.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/BackupToDBCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/BackupToDBUpgrade.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/BulkLoad.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/Cache.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ChangeConfig.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ClientTransactionProfileCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/CommitBugCheck.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ConfigureDatabase.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ConflictRange.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ConsistencyCheck.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/CpuProfiler.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Cycle.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/DDBalance.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/DDMetrics.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/DDMetricsExclude.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/DataDistributionMetrics.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/DifferentClustersSameRV.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/DiskDurability.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/DiskDurabilityTest.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/DummyWorkload.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ExternalWorkload.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/FastTriggeredWatches.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/FileSystem.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/FuzzApiCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Increment.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/IndexScan.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Inventory.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/KVStoreTest.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/KillRegion.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/LocalRatekeeper.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/LockDatabase.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/LogMetrics.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/LowLatency.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/MachineAttrition.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Mako.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/MemoryLifetime.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/MetricLogging.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ParallelRestore.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Performance.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Ping.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/PopulateTPCC.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/PubSubMultiples.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/QueuePush.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/RYWDisable.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/RYWPerformance.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/RandomClogging.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/RandomMoveKeys.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/RandomSelector.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/ReadHotDetection.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ReadWrite.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/RemoveServersSafely.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/ReportConflictingKeys.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Rollback.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/RyowCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/SaveAndKill.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/SelectorCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Serializability.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Sideband.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/SlowTaskWorkload.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/SnapTest.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/SpecialKeySpaceCorrectness.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/StatusWorkload.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Storefront.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/StreamingRead.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/SuspendProcesses.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/TPCC.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/TagThrottleApi.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/TargetedKill.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/TaskBucketCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/ThreadSafety.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Throttling.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Throughput.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/TimeKeeperCorrectness.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/TriggerRecovery.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/UnitPerf.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/UnitTests.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Unreadable.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/VersionStamp.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/WatchAndWait.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Watches.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/WorkerErrors.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/WriteBandwidth.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/WriteDuringRead.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/flow/ActorCollection.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/flow/CompressedInt.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/flow/Net2.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/flow/Profiler.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/flow/Stats.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/flow/TLSConfig.actor.g.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="bld/flow/genericactors.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="build/cmake/package_tester/fdb_c_app/app.c"
@@ -2175,7 +2210,7 @@
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="documentation/tutorial/tutorial.actor.cpp"
@@ -2193,13 +2228,7 @@
             <pElem>bld/bindings/c</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2221,13 +2250,7 @@
             <pElem>bld/bindings/c</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2258,13 +2281,7 @@
             <pElem>bld/bindings/c</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/bindings/java</pElem>
           </incDir>
           <preprocessorList>
@@ -2305,43 +2322,25 @@
       </folder>
       <folder path="0/bld/bindings">
         <ccTool>
+          <incDir>
+            <pElem>bld/bindings/flow</pElem>
+            <pElem>bindings/flow</pElem>
+            <pElem>bindings/flow/tester</pElem>
+            <pElem>bld/bindings/flow/tester</pElem>
+            <pElem>bld/bindings/c</pElem>
+            <pElem>bindings/c</pElem>
+            <pElem>bld/bindings/c/foundationdb</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+          </incDir>
           <preprocessorList>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
-      <folder path="0/bld/bindings/flow/tester">
-        <ccTool>
-          <incDir>
-            <pElem>bindings/flow/tester</pElem>
-            <pElem>bld/bindings/flow/tester</pElem>
-            <pElem>bindings/flow</pElem>
-            <pElem>bld/bindings/flow</pElem>
-            <pElem>bld/bindings/c</pElem>
-            <pElem>bindings/c</pElem>
-            <pElem>bld/bindings/c/foundationdb</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
       <folder path="0/bld/documentation">
         <ccTool>
           <incDir>
-            <pElem>documentation/tutorial</pElem>
-            <pElem>bld/documentation/tutorial</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>HAVE_OPENSSL</Elem>
@@ -2351,15 +2350,7 @@
       <folder path="0/bld/fdbbackup">
         <ccTool>
           <incDir>
-            <pElem>fdbbackup</pElem>
-            <pElem>bld/fdbbackup</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>HAVE_OPENSSL</Elem>
@@ -2369,15 +2360,7 @@
       <folder path="0/bld/fdbcli">
         <ccTool>
           <incDir>
-            <pElem>fdbcli</pElem>
-            <pElem>bld/fdbcli</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>HAVE_OPENSSL</Elem>
@@ -2387,13 +2370,7 @@
       <folder path="0/bld/fdbclient">
         <ccTool>
           <incDir>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>HAVE_OPENSSL</Elem>
@@ -2403,12 +2380,8 @@
       <folder path="0/bld/fdbrpc">
         <ccTool>
           <incDir>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>HAVE_OPENSSL</Elem>
@@ -2418,31 +2391,28 @@
       <folder path="0/bld/fdbserver">
         <ccTool>
           <incDir>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
+      <folder path="0/bld/fdbserver/workloads">
+        <ccTool>
+          <incDir>
+            <pElem>bld/fdbserver</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
       <folder path="0/bld/flow">
         <ccTool>
           <incDir>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
           <preprocessorList>
             <Elem>HAVE_OPENSSL</Elem>
@@ -2473,15 +2443,8 @@
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbcli</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbcli</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2500,13 +2463,8 @@
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2525,13 +2483,8 @@
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2550,7 +2503,6 @@
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>bld/fdbclient</pElem>
             <pElem>bld/fdbmonitor</pElem>
           </incDir>
           <preprocessorList>
@@ -2589,9 +2541,8 @@
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2637,8 +2588,8 @@
         <ccTool flags="3">
         </ccTool>
       </item>
-      <item path="fdbcli/linenoise/linenoise.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbcli/linenoise/linenoise.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="fdbclient/AsyncFileBlobStore.actor.cpp"
@@ -2649,17 +2600,12 @@
         </ccTool>
       </item>
       <item path="fdbclient/AutoPublicAddress.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2702,17 +2648,12 @@
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2738,17 +2679,12 @@
         </ccTool>
       </item>
       <item path="fdbclient/JsonBuilder.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2767,17 +2703,12 @@
         </ccTool>
       </item>
       <item path="fdbclient/Knobs.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2815,17 +2746,12 @@
         </ccTool>
       </item>
       <item path="fdbclient/RYWIterator.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2847,17 +2773,12 @@
         </ccTool>
       </item>
       <item path="fdbclient/Schemas.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2876,17 +2797,12 @@
         </ccTool>
       </item>
       <item path="fdbclient/Subspace.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2901,17 +2817,12 @@
         </ccTool>
       </item>
       <item path="fdbclient/SystemData.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2937,17 +2848,12 @@
         </ccTool>
       </item>
       <item path="fdbclient/Tuple.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbclient</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -2961,28 +2867,48 @@
           </preprocessorList>
         </ccTool>
       </item>
-      <item path="fdbclient/libb64/cdecode.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbclient/VersionedMap.cpp" ex="false" tool="1" flavor2="11">
+        <ccTool flags="2">
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>bld</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbclient</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
+            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
+            <Elem>CMAKE_BUILD</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>HAVE_OPENSSL</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>NO_INTELLISENSE</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="fdbclient/libb64/cdecode.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbclient/libb64/cencode.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbclient/libb64/cencode.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbclient/md5/md5.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbclient/md5/md5.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="fdbclient/sha1/SHA1.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
-      <item path="fdbclient/zipf.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbclient/zipf.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="fdbmonitor/fdbmonitor.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="fdbrpc/ActorFuzz.actor.cpp" ex="false" tool="1" flavor2="11">
@@ -3001,16 +2927,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/AsyncFileWriteChecker.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3041,16 +2964,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/Locality.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3065,16 +2985,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/Net2FileSystem.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3089,16 +3006,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/QueueModel.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3117,16 +3031,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/ReplicationPolicy.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3141,16 +3052,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/ReplicationTypes.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3165,16 +3073,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/ReplicationUtils.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3189,16 +3094,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/TraceFileIO.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3220,20 +3122,20 @@
         <ccTool flags="3">
         </ccTool>
       </item>
-      <item path="fdbrpc/libcoroutine/Common.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/libcoroutine/Common.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/libcoroutine/Coro.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/libcoroutine/Coro.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/libcoroutine/context.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/libcoroutine/context.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/libeio/eio.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/libeio/eio.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="fdbrpc/sim2.actor.cpp" ex="false" tool="1" flavor2="11">
@@ -3241,16 +3143,13 @@
         </ccTool>
       </item>
       <item path="fdbrpc/sim_validation.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
             <pElem>fdbrpc/libeio</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbrpc</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3264,79 +3163,72 @@
           </preprocessorList>
         </ccTool>
       </item>
-      <item path="fdbrpc/zlib/adler32.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/adler32.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/crc32.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/crc32.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/deflate.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/deflate.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/gzclose.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/gzclose.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/gzlib.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/gzlib.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/gzread.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/gzread.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/gzwrite.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/gzwrite.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/infback.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/infback.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/inffast.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/inffast.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/inflate.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/inflate.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/inftrees.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/inftrees.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/trees.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/trees.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
-      <item path="fdbrpc/zlib/zutil.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="fdbrpc/zlib/zutil.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="fdbserver/ApplyMetadataMutation.cpp"
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3438,23 +3330,16 @@
         </ccTool>
       </item>
       <item path="fdbserver/Knobs.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3469,23 +3354,16 @@
         </ccTool>
       </item>
       <item path="fdbserver/LatencyBandConfig.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3533,6 +3411,30 @@
       </item>
       <item path="fdbserver/MoveKeys.actor.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="3">
+        </ccTool>
+      </item>
+      <item path="fdbserver/MutationTracking.cpp" ex="false" tool="1" flavor2="11">
+        <ccTool flags="2">
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>bld</pElem>
+            <pElem>bindings/c</pElem>
+            <pElem>bld/bindings/c</pElem>
+            <pElem>bld/fdbserver/workloads</pElem>
+            <pElem>fdbserver/workloads</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
+            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
+            <Elem>CMAKE_BUILD</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>HAVE_OPENSSL</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>NO_INTELLISENSE</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="fdbserver/OldTLogServer_4_6.actor.cpp"
@@ -3610,23 +3512,16 @@
         </ccTool>
       </item>
       <item path="fdbserver/SkipList.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3660,23 +3555,16 @@
         </ccTool>
       </item>
       <item path="fdbserver/VFSAsync.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -3724,8 +3612,8 @@
       <item path="fdbserver/sqlite/sqlite3.amalgamation.c"
             ex="false"
             tool="0"
-            flavor2="3">
-        <cTool flags="2">
+            flavor2="10">
+        <cTool flags="1">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
@@ -3770,23 +3658,16 @@
         </ccTool>
       </item>
       <item path="fdbserver/workloads/AsyncFile.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4025,23 +3906,16 @@
         </ccTool>
       </item>
       <item path="fdbserver/workloads/Fuzz.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4143,23 +4017,16 @@
             ex="false"
             tool="1"
             flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>fdbserver</pElem>
-            <pElem>bld/fdbserver</pElem>
             <pElem>bindings/c</pElem>
             <pElem>bld/bindings/c</pElem>
             <pElem>bld/fdbserver/workloads</pElem>
             <pElem>fdbserver/workloads</pElem>
-            <pElem>fdbclient</pElem>
-            <pElem>bld/fdbclient</pElem>
-            <pElem>fdbrpc</pElem>
-            <pElem>bld/fdbrpc</pElem>
-            <pElem>flow</pElem>
-            <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/fdbserver</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4480,13 +4347,12 @@
         </ccTool>
       </item>
       <item path="flow/Arena.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4505,13 +4371,12 @@
         </ccTool>
       </item>
       <item path="flow/Deque.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4526,13 +4391,12 @@
         </ccTool>
       </item>
       <item path="flow/DeterministicRandom.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4547,13 +4411,12 @@
         </ccTool>
       </item>
       <item path="flow/Error.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4568,13 +4431,12 @@
         </ccTool>
       </item>
       <item path="flow/FastAlloc.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4589,13 +4451,12 @@
         </ccTool>
       </item>
       <item path="flow/FaultInjection.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4610,13 +4471,12 @@
         </ccTool>
       </item>
       <item path="flow/FileTraceLogWriter.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4630,18 +4490,17 @@
           </preprocessorList>
         </ccTool>
       </item>
-      <item path="flow/Hash3.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+      <item path="flow/Hash3.c" ex="false" tool="0" flavor2="10">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="flow/IThreadPool.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4656,13 +4515,12 @@
         </ccTool>
       </item>
       <item path="flow/IndexedSet.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4677,13 +4535,12 @@
         </ccTool>
       </item>
       <item path="flow/JsonTraceLogFormatter.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4698,13 +4555,12 @@
         </ccTool>
       </item>
       <item path="flow/Knobs.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4723,13 +4579,12 @@
         </ccTool>
       </item>
       <item path="flow/Net2Packet.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4744,13 +4599,12 @@
         </ccTool>
       </item>
       <item path="flow/Platform.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4769,13 +4623,12 @@
         </ccTool>
       </item>
       <item path="flow/SignalSafeUnwind.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4794,13 +4647,12 @@
         </ccTool>
       </item>
       <item path="flow/SystemMonitor.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4815,13 +4667,12 @@
         </ccTool>
       </item>
       <item path="flow/TDMetric.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4840,13 +4691,12 @@
         </ccTool>
       </item>
       <item path="flow/ThreadHelper.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4861,13 +4711,12 @@
         </ccTool>
       </item>
       <item path="flow/ThreadPrimitives.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4882,13 +4731,12 @@
         </ccTool>
       </item>
       <item path="flow/Trace.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4903,13 +4751,12 @@
         </ccTool>
       </item>
       <item path="flow/UnitTest.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4924,13 +4771,12 @@
         </ccTool>
       </item>
       <item path="flow/XmlTraceLogFormatter.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4952,13 +4798,12 @@
         </ccTool>
       </item>
       <item path="flow/crc32c.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4973,13 +4818,12 @@
         </ccTool>
       </item>
       <item path="flow/flat_buffers.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -4994,13 +4838,12 @@
         </ccTool>
       </item>
       <item path="flow/flow.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -5019,13 +4862,12 @@
         </ccTool>
       </item>
       <item path="flow/network.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -5040,13 +4882,12 @@
         </ccTool>
       </item>
       <item path="flow/serialize.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -5061,13 +4902,52 @@
         </ccTool>
       </item>
       <item path="flow/stacktrace.amalgamation.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
+            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
+            <Elem>CMAKE_BUILD</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>HAVE_OPENSSL</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>NO_INTELLISENSE</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="flow/test_memcpy.cpp" ex="false" tool="1" flavor2="11">
+        <ccTool flags="2">
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>bld</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/flow</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
+            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
+            <Elem>CMAKE_BUILD</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>HAVE_OPENSSL</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>NO_INTELLISENSE</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="flow/test_memcpy_perf.cpp" ex="false" tool="1" flavor2="11">
+        <ccTool flags="2">
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>bld</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+            <pElem>bld/flow</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
@@ -5082,13 +4962,12 @@
         </ccTool>
       </item>
       <item path="flow/version.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="2">
           <incDir>
             <pElem>.</pElem>
             <pElem>bld</pElem>
-            <pElem>flow</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
           </incDir>
           <preprocessorList>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
