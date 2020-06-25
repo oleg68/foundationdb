@@ -159,6 +159,7 @@ public:
 
 		taskBucket->setOptions(tr);
 
+		TraceEvent(SevInfo, "debug.TaskBucketImpl.getOne");
 		// give it some chances for the timed out tasks to get into the task loop in the case of 
 		// many other new tasks get added so that the timed out tasks never get chances to re-run
 		if (deterministicRandom()->random01() < CLIENT_KNOBS->TASKBUCKET_CHECK_TIMEOUT_CHANCE) {
@@ -200,12 +201,14 @@ public:
 				Reference<Task> task = wait(getOne(tr, taskBucket));
 				return task;
 			}
+			TraceEvent(SevInfo, "debug.TaskBucketImpl.getOne: no tasks");
 			return Reference<Task>();
 		}
 
 		// Now we know the task key is present and we have the available space for the task's priority
 		state Tuple t = availableSpace.unpack(taskKey.get());
 		state Key taskUID = t.getString(0);
+		TraceEvent(SevInfo, "debug.TaskBucketImpl.getOne").detail("taskUID", taskUID);
 		state Subspace taskAvailableSpace = availableSpace.get(taskUID);
 
 		state Reference<Task> task(new Task());
@@ -504,8 +507,11 @@ public:
 			state Reference<ReadYourWritesTransaction> tr(new ReadYourWritesTransaction(cx));
 			try {
 				taskBucket->setOptions(tr);
+				TraceEvent(SevInfo, "debug.TaskBucketImpl.watchPaused").detail("pauseKey", taskBucket->pauseKey);
 				Optional<Value> pausedVal = wait(tr->get(taskBucket->pauseKey));
+				TraceEvent(SevInfo, "debug.TaskBucketImpl.watchPaused").detail("pauseKey", taskBucket->pauseKey).detail("pausedVal.present", pausedVal.present());
 				paused->set(pausedVal.present());
+				TraceEvent(SevInfo, "debug.TaskBucketImpl.watchPaused.after_set").detail("pauseKey", taskBucket->pauseKey).detail("pausedVal.present", pausedVal.present());
 				state Future<Void> watchPausedFuture = tr->watch(taskBucket->pauseKey);
 				wait(tr->commit());
 				wait(watchPausedFuture);
@@ -518,13 +524,17 @@ public:
 
 	ACTOR static Future<Void> run(Database cx, Reference<TaskBucket> taskBucket, Reference<FutureBucket> futureBucket, double *pollDelay, int maxConcurrentTasks) {
 		state Reference<AsyncVar<bool>> paused = Reference<AsyncVar<bool>>( new AsyncVar<bool>(true) );
+		TraceEvent(SevInfo, "debug.TaskBucketImpl.run");
 		state Future<Void> watchPausedFuture = watchPaused(cx, taskBucket, paused);
+		TraceEvent(SevInfo, "debug.TaskBucketImpl.run.after watchPaused");
 		taskBucket->metricLogger = traceCounters("TaskBucketMetrics", taskBucket->dbgid, CLIENT_KNOBS->TASKBUCKET_LOGGING_DELAY, &taskBucket->cc);
 		loop {
 			while(paused->get()) {
+				TraceEvent(SevInfo, "debug.TaskBucketImpl.run.paused");
 				wait(paused->onChange() || watchPausedFuture);
 			}
 
+			TraceEvent(SevInfo, "debug.TaskBucketImpl.run.before_dispatch");
 			wait(dispatch(cx, taskBucket, futureBucket, pollDelay, maxConcurrentTasks) || paused->onChange() || watchPausedFuture);
 		}
 	}
