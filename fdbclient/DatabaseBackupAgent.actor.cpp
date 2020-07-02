@@ -1519,11 +1519,13 @@ namespace dbBackup {
 
 					// Use existing beginVersion if we already have one
 					Optional<Key> backupStartVersion = wait(tr->get(config.pack(BackupAgentBase::backupStartVersion)));
+					TraceEvent("debug.StartFullBackupTaskFunc._execute").detail("beginVersionKey", beginVersionKey).detail("backupStartVersion", backupStartVersion);
 					if (backupStartVersion.present()) {
 						beginVersionKey = backupStartVersion.get();
 					} else {
 						tr->set(config.pack(BackupAgentBase::backupStartVersion), beginVersionKey);
 					}
+					TraceEvent("debug.StartFullBackupTaskFunc._execute").detail("new beginVersionKey", beginVersionKey);
 
 					task->params[BackupAgentBase::keyBeginVersion] = beginVersionKey;
 
@@ -1588,6 +1590,7 @@ namespace dbBackup {
 			state Version beginVersion = BinaryReader::fromStringRef<Version>(task->params[BackupAgentBase::keyBeginVersion], Unversioned());
 			state Standalone<VectorRef<KeyRangeRef>> backupRanges = BinaryReader::fromStringRef<Standalone<VectorRef<KeyRangeRef>>>(task->params[DatabaseBackupAgent::keyConfigBackupRanges], IncludeVersion());
 
+			TraceEvent("debug.StartFullBackupTaskFunc._finish").detail("beginVersionKey", beginVersion);
 			tr->set(logUidValue.withPrefix(applyMutationsBeginRange.begin), BinaryWriter::toValue(beginVersion, Unversioned()));
 			tr->set(logUidValue.withPrefix(applyMutationsEndRange.begin), BinaryWriter::toValue(beginVersion, Unversioned()));
 			tr->set(states.pack(DatabaseBackupAgent::keyStateStatus), StringRef(BackupAgentBase::getStateText(BackupAgentBase::STATE_RUNNING)));
