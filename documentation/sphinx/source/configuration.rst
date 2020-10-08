@@ -222,7 +222,7 @@ Contains basic configuration parameters of the ``fdbmonitor`` process. ``user`` 
     # kill_on_configuration_change = true
     # disable_lifecycle_logging = false
 
-Contains settings applicable to all processes (e.g. fdbserver, backup_agent).
+Contains settings applicable to all processes (e.g. fdbserver, backup_agent). These settings are not applicable to the fdbmonitor process itself.
 
 * ``cluster_file``: Specifies the location of the cluster file. This file and the directory that contains it must be writable by all processes (i.e. by the user or group set in the ``[fdbmonitor]`` section).
 * ``delete_envvars``: A space separated list of environment variables to remove from the environments of child processes. This can be used if the ``fdbmonitor`` process needs to be run with environment variables that are undesired in its children.
