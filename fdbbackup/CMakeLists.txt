@@ -40,6 +40,12 @@ if(NOT OPEN_FOR_IDE)
     FILE_DIR bin
     LINK_DIR bin
     FILE_NAME fdbbackup
+    LINK_NAME fastrestore_tool)
+  install_symlink(
+    COMPONENT clients
+    FILE_DIR bin
+    LINK_DIR bin
+    FILE_NAME fdbbackup
     LINK_NAME dr_agent)
   install_symlink(
     COMPONENT clients
