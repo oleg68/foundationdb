@@ -554,6 +554,7 @@
             <in>Performance.actor.g.cpp</in>
             <in>Ping.actor.g.cpp</in>
             <in>PopulateTPCC.actor.g.cpp</in>
+            <in>ProtocolVersion.actor.g.cpp</in>
             <in>PubSubMultiples.actor.g.cpp</in>
             <in>QueuePush.actor.g.cpp</in>
             <in>RYWDisable.actor.g.cpp</in>
@@ -981,6 +982,7 @@
         <in>FaultInjection.cpp</in>
         <in>FileTraceLogWriter.cpp</in>
         <in>Hash3.c</in>
+        <in>Histogram.cpp</in>
         <in>IThreadPool.cpp</in>
         <in>IndexedSet.cpp</in>
         <in>JsonTraceLogFormatter.cpp</in>
@@ -1069,1843 +1071,6 @@
           <preBuildCommand>cmake -G Ninja -DCMAKE_CXX_STANDARD_LIBRARIES="-lz" ..</preBuildCommand>
         </preBuild>
       </makefileType>
-      <item path="/home/oleg/work/fdb/FoundationDb/bindings/c/test/unit/fdb_api.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="4">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bindings/c/test/unit/setup_tests.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="4">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bindings/c/test/unit/unit_tests.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="4">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb-build/CMakeFiles/3.18.3/CompilerIdC/CMakeCCompilerId.c"
-            ex="false"
-            tool="0"
-            flavor2="2">
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb-build/CMakeFiles/3.18.3/CompilerIdCXX/CMakeCXXCompilerId.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="8">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/cache/cache.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/cache/clock_cache.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/cache/lru_cache.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/cache/sharded_cache.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/arena_wrapped_db_iter.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/blob/blob_file_addition.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/blob/blob_file_garbage.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/blob/blob_file_meta.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/builder.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/c.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/column_family.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compacted_db_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_iterator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_job.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_picker.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_picker_fifo.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_picker_level.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_picker_universal.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/convenience.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_filesnapshot.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_compaction_flush.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_debug.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_experimental.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_files.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_open.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_readonly.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_secondary.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_write.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_info_dumper.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_iter.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/dbformat.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/error_handler.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/event_helpers.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/experimental.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/external_sst_file_ingestion_job.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/file_indexer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/flush_job.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/flush_scheduler.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/forward_iterator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/import_column_family_job.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/internal_stats.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/log_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/log_writer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/logs_with_prep_tracker.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/malloc_stats.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/memtable.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/memtable_list.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/merge_helper.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/merge_operator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/range_del_aggregator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/range_tombstone_fragmenter.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/repair.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/snapshot_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/table_cache.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/table_properties_collector.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/transaction_log_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/trim_history_scheduler.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/version_builder.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/version_edit.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/version_edit_handler.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/version_set.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/wal_manager.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/write_batch.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/write_batch_base.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/write_controller.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/db/write_thread.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env_chroot.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env_encryption.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env_hdfs.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env_posix.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/file_system.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/fs_posix.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/io_posix.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/env/mock_env.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/delete_scheduler.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/file_prefetch_buffer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/file_util.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/filename.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/random_access_file_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/read_write_util.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/readahead_raf.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/sequence_file_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/sst_file_manager_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/file/writable_file_writer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/logging/auto_roll_logger.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/logging/event_logger.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/logging/log_buffer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memory/arena.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memory/concurrent_arena.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memory/jemalloc_nodump_allocator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memory/memkind_kmem_allocator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/alloc_tracker.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/hash_linklist_rep.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/hash_skiplist_rep.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/skiplistrep.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/vectorrep.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/write_buffer_manager.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/histogram.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/histogram_windowing.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/in_memory_stats_history.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/instrumented_mutex.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/iostats_context.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/perf_context.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/perf_level.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/persistent_stats_history.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/statistics.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/thread_status_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/thread_status_updater.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/thread_status_util.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/thread_status_util_debug.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/options/cf_options.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/options/db_options.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/options/options.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/options/options_helper.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/options/options_parser.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/port/port_posix.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/port/stack_trace.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/adaptive/adaptive_table_factory.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/binary_search_index_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_filter_block.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_table_builder.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_table_factory.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_table_iterator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_table_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_builder.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_prefetcher.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_prefix_index.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/data_block_footer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/data_block_hash_index.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/filter_block_reader_common.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/filter_policy.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/flush_block_policy.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/full_filter_block.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/hash_index_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/index_builder.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/index_reader_common.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/parsed_full_filter_block.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/partitioned_filter_block.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/partitioned_index_iterator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/partitioned_index_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/reader_common.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/uncompression_dict_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_fetcher.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/cuckoo/cuckoo_table_builder.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/cuckoo/cuckoo_table_factory.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/cuckoo/cuckoo_table_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/format.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/get_context.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/iterator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/merging_iterator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/meta_blocks.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/persistent_cache_helper.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_bloom.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_builder.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_factory.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_index.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_key_coding.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/sst_file_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/sst_file_writer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/table_properties.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/table/two_level_iterator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/test_util/sync_point.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/test_util/sync_point_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/test_util/testutil.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/test_util/transaction_test_util.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/detail/Futex.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/synchronization/AtomicNotification.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/synchronization/DistributedMutex.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/synchronization/ParkingLot.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/synchronization/WaitOptions.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/block_cache_analyzer/block_cache_trace_analyzer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/dump/db_dump_tool.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/ldb_cmd.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/ldb_tool.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/sst_dump_tool.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/trace_analyzer_tool.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/trace_replay/block_cache_tracer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/trace_replay/trace_replay.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/coding.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/compaction_job_stats_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/comparator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/compression_context_cache.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/concurrent_task_limiter_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/crc32c.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="2">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/dynamic_bloom.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/file_checksum_helper.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/hash.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/murmurhash.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/random.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/rate_limiter.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/slice.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/status.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/string_util.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/thread_local.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/threadpool_imp.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/util/xxhash.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/backupable/backupable_db.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_compaction_filter.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_db.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_db_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_db_impl_filesnapshot.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_dump_tool.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_file.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_log_format.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_log_reader.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_log_writer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/cassandra/cassandra_compaction_filter.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/cassandra/format.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/cassandra/merge_operator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/checkpoint/checkpoint_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/compaction_filters/remove_emptyvalue_compactionfilter.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/debug.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/env_mirror.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/env_timed.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/leveldb_options/leveldb_options.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/memory/memory_util.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/bytesxor.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/max.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/put.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/sortlist.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/string_append/stringappend.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/string_append/stringappend2.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/uint64add.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/object_registry.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/option_change_migration/option_change_migration.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/options/options_util.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/block_cache_tier.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/block_cache_tier_file.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/block_cache_tier_metadata.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/persistent_cache_tier.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/volatile_tier_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/simulator_cache/cache_simulator.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/simulator_cache/sim_cache.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/table_properties_collectors/compact_on_deletion_collector.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/trace/file_trace_reader_writer.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/optimistic_transaction.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/optimistic_transaction_db_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/pessimistic_transaction.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/pessimistic_transaction_db.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/snapshot_checker.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/transaction_base.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/transaction_db_mutex_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/transaction_lock_mgr.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/transaction_util.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/write_prepared_txn.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/write_prepared_txn_db.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/write_unprepared_txn.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/write_unprepared_txn_db.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/ttl/db_ttl_impl.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/write_batch_with_index/write_batch_with_index.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/write_batch_with_index/write_batch_with_index_internal.cc"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/toml11Project-prefix/src/toml11Project-build/CMakeFiles/3.18.3/CompilerIdC/CMakeCCompilerId.c"
-            ex="false"
-            tool="0"
-            flavor2="2">
-      </item>
-      <item path="/home/oleg/work/fdb/FoundationDb/bld/toml11Project-prefix/src/toml11Project-build/CMakeFiles/3.18.3/CompilerIdCXX/CMakeCXXCompilerId.cpp"
-            ex="false"
-            tool="1"
-            flavor2="11">
-        <ccTool flags="8">
-        </ccTool>
-      </item>
       <item path="/usr/share/cmake/Modules/CMakeCCompilerABI.c"
             ex="false"
             tool="0"
@@ -2968,6 +1133,9 @@
             <pElem>bld/bindings/c/foundationdb</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
             <Elem>fdb_c_EXPORTS</Elem>
           </preprocessorList>
         </ccTool>
@@ -2980,6 +1148,7 @@
             <pElem>bld/bindings/c/foundationdb</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>fdb_c_EXPORTS</Elem>
           </preprocessorList>
         </ccTool>
@@ -3006,6 +1175,24 @@
       <item path="bindings/c/test/txn_size_test.c" ex="false" tool="0" flavor2="10">
         <cTool flags="3">
         </cTool>
+      </item>
+      <item path="bindings/c/test/unit/fdb_api.cpp" ex="false" tool="1" flavor2="11">
+        <ccTool flags="4">
+        </ccTool>
+      </item>
+      <item path="bindings/c/test/unit/setup_tests.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="4">
+        </ccTool>
+      </item>
+      <item path="bindings/c/test/unit/unit_tests.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="4">
+        </ccTool>
       </item>
       <item path="bindings/c/test/workloads/SimpleWorkload.cpp"
             ex="false"
@@ -3236,10 +1423,18 @@
             tool="1"
             flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbcli/fdbcli.actor.g.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbclient/AsyncFileBlobStore.actor.g.cpp"
@@ -3315,7 +1510,9 @@
             <pElem>/usr/include/c++/10/x86_64-redhat-linux</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3326,7 +1523,9 @@
         <ccTool flags="4">
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3337,7 +1536,9 @@
         <ccTool flags="4">
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3347,7 +1548,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3358,7 +1559,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3369,7 +1570,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3380,7 +1581,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3391,7 +1592,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3484,7 +1685,9 @@
             <pElem>/usr/include/c++/10/x86_64-redhat-linux</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3494,7 +1697,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3503,7 +1706,9 @@
         <ccTool flags="4">
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3513,7 +1718,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3522,7 +1727,9 @@
         <ccTool flags="4">
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3532,7 +1739,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3543,7 +1750,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3622,7 +1829,9 @@
             <pElem>/usr/include/c++/10/x86_64-redhat-linux</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3632,7 +1841,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3643,7 +1852,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3654,7 +1863,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3665,7 +1874,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3677,7 +1886,9 @@
         <ccTool flags="4">
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3687,7 +1898,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3698,7 +1909,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3709,7 +1920,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3720,7 +1931,7 @@
             flavor2="11">
         <ccTool flags="4">
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -3798,12 +2009,19 @@
             <pElem>/usr/include/c++/10/x86_64-redhat-linux</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/ActorFuzz.actor.g.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/AsyncFileCached.actor.g.cpp"
@@ -3811,6 +2029,11 @@
             tool="1"
             flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/AsyncFileNonDurable.actor.g.cpp"
@@ -3818,6 +2041,9 @@
             tool="1"
             flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/FailureMonitor.actor.g.cpp"
@@ -3825,10 +2051,20 @@
             tool="1"
             flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/FlowTests.actor.g.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/FlowTransport.actor.g.cpp"
@@ -3836,6 +2072,9 @@
             tool="1"
             flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/HealthMonitor.actor.g.cpp"
@@ -3843,18 +2082,36 @@
             tool="1"
             flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/IAsyncFile.actor.g.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/Stats.actor.g.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/dsltest.actor.g.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/genericactors.actor.g.cpp"
@@ -3862,10 +2119,16 @@
             tool="1"
             flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbrpc/sim2.actor.g.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="4">
+          <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbserver/BackupProgress.actor.g.cpp"
@@ -3882,7 +2145,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -3902,7 +2165,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -3922,7 +2185,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -3942,7 +2205,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -3962,7 +2225,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -3982,7 +2245,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4002,7 +2265,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4022,7 +2285,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4042,7 +2305,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4062,7 +2325,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4082,7 +2345,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4102,7 +2365,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4122,7 +2385,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4142,7 +2405,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4162,7 +2425,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4182,7 +2445,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4202,7 +2465,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4222,7 +2485,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4242,7 +2505,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4262,7 +2525,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4282,7 +2545,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4373,7 +2636,9 @@
             <pElem>/usr/include/c++/10/x86_64-redhat-linux</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -4391,7 +2656,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4411,7 +2676,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4431,7 +2696,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4451,7 +2716,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4471,7 +2736,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4491,7 +2756,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4511,7 +2776,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4531,7 +2796,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4551,7 +2816,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4571,7 +2836,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4591,7 +2856,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4611,7 +2876,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4692,7 +2957,9 @@
             <pElem>/usr/include/c++/10/x86_64-redhat-linux</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -4710,7 +2977,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4730,7 +2997,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4750,7 +3017,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4770,7 +3037,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4787,7 +3054,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4807,7 +3074,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4827,7 +3094,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4847,7 +3114,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4867,7 +3134,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4887,7 +3154,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4907,7 +3174,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4927,7 +3194,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4947,7 +3214,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -4964,10 +3231,22 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb-build/CMakeFiles/3.18.3/CompilerIdC/CMakeCCompilerId.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb-build/CMakeFiles/3.18.3/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="8">
         </ccTool>
       </item>
       <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb-build/build_version.cc"
@@ -5000,6 +3279,1798 @@
           </preprocessorList>
         </ccTool>
       </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/cache/cache.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/cache/clock_cache.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/cache/lru_cache.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/cache/sharded_cache.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/arena_wrapped_db_iter.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/blob/blob_file_addition.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/blob/blob_file_garbage.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/blob/blob_file_meta.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/builder.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/c.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/column_family.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compacted_db_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_iterator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_job.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_picker.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_picker_fifo.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_picker_level.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/compaction/compaction_picker_universal.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/convenience.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_filesnapshot.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_compaction_flush.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_debug.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_experimental.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_files.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_open.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_readonly.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_secondary.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_impl/db_impl_write.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_info_dumper.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/db_iter.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/dbformat.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/error_handler.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/event_helpers.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/experimental.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/external_sst_file_ingestion_job.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/file_indexer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/flush_job.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/flush_scheduler.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/forward_iterator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/import_column_family_job.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/internal_stats.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/log_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/log_writer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/logs_with_prep_tracker.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/malloc_stats.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/memtable.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/memtable_list.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/merge_helper.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/merge_operator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/range_del_aggregator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/range_tombstone_fragmenter.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/repair.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/snapshot_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/table_cache.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/table_properties_collector.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/transaction_log_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/trim_history_scheduler.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/version_builder.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/version_edit.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/version_edit_handler.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/version_set.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/wal_manager.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/write_batch.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/write_batch_base.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/write_controller.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/db/write_thread.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env_chroot.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env_encryption.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env_hdfs.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/env_posix.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/file_system.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/fs_posix.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/io_posix.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/env/mock_env.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/delete_scheduler.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/file_prefetch_buffer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/file_util.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/filename.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/random_access_file_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/read_write_util.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/readahead_raf.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/sequence_file_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/sst_file_manager_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/file/writable_file_writer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/logging/auto_roll_logger.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/logging/event_logger.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/logging/log_buffer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memory/arena.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memory/concurrent_arena.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memory/jemalloc_nodump_allocator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memory/memkind_kmem_allocator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/alloc_tracker.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/hash_linklist_rep.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/hash_skiplist_rep.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/skiplistrep.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/vectorrep.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/memtable/write_buffer_manager.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/histogram.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/histogram_windowing.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/in_memory_stats_history.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/instrumented_mutex.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/iostats_context.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/perf_context.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/perf_level.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/persistent_stats_history.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/statistics.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/thread_status_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/thread_status_updater.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/thread_status_util.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/monitoring/thread_status_util_debug.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/options/cf_options.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/options/db_options.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/options/options.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/options/options_helper.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/options/options_parser.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/port/port_posix.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/port/stack_trace.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/adaptive/adaptive_table_factory.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/binary_search_index_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_filter_block.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_table_builder.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_table_factory.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_table_iterator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_based_table_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_builder.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_prefetcher.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/block_prefix_index.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/data_block_footer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/data_block_hash_index.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/filter_block_reader_common.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/filter_policy.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/flush_block_policy.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/full_filter_block.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/hash_index_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/index_builder.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/index_reader_common.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/parsed_full_filter_block.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/partitioned_filter_block.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/partitioned_index_iterator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/partitioned_index_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/reader_common.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_based/uncompression_dict_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/block_fetcher.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/cuckoo/cuckoo_table_builder.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/cuckoo/cuckoo_table_factory.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/cuckoo/cuckoo_table_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/format.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/get_context.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/iterator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/merging_iterator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/meta_blocks.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/persistent_cache_helper.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_bloom.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_builder.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_factory.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_index.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_key_coding.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/plain/plain_table_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/sst_file_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/sst_file_writer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/table_properties.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/table/two_level_iterator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/test_util/sync_point.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/test_util/sync_point_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/test_util/testutil.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/test_util/transaction_test_util.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/detail/Futex.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/synchronization/AtomicNotification.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/synchronization/DistributedMutex.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/synchronization/ParkingLot.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/third-party/folly/folly/synchronization/WaitOptions.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/block_cache_analyzer/block_cache_trace_analyzer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/dump/db_dump_tool.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/ldb_cmd.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/ldb_tool.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/sst_dump_tool.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/tools/trace_analyzer_tool.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/trace_replay/block_cache_tracer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/trace_replay/trace_replay.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/coding.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/compaction_job_stats_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/comparator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/compression_context_cache.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/concurrent_task_limiter_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/crc32c.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/dynamic_bloom.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/file_checksum_helper.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/hash.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/murmurhash.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/random.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/rate_limiter.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/slice.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/status.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/string_util.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/thread_local.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/threadpool_imp.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/util/xxhash.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/backupable/backupable_db.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_compaction_filter.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_db.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_db_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_db_impl_filesnapshot.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_dump_tool.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_file.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_log_format.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_log_reader.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/blob_db/blob_log_writer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/cassandra/cassandra_compaction_filter.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/cassandra/format.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/cassandra/merge_operator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/checkpoint/checkpoint_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/compaction_filters/remove_emptyvalue_compactionfilter.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/debug.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/env_mirror.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/env_timed.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/leveldb_options/leveldb_options.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/memory/memory_util.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/bytesxor.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/max.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/put.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/sortlist.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/string_append/stringappend.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/string_append/stringappend2.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/merge_operators/uint64add.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/object_registry.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/option_change_migration/option_change_migration.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/options/options_util.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/block_cache_tier.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/block_cache_tier_file.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/block_cache_tier_metadata.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/persistent_cache_tier.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/persistent_cache/volatile_tier_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/simulator_cache/cache_simulator.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/simulator_cache/sim_cache.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/table_properties_collectors/compact_on_deletion_collector.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/trace/file_trace_reader_writer.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/optimistic_transaction.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/optimistic_transaction_db_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/pessimistic_transaction.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/pessimistic_transaction_db.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/snapshot_checker.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/transaction_base.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/transaction_db_mutex_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/transaction_lock_mgr.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/transaction_util.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/write_prepared_txn.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/write_prepared_txn_db.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/write_unprepared_txn.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/transactions/write_unprepared_txn_db.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/ttl/db_ttl_impl.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/write_batch_with_index/write_batch_with_index.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/rocksdb-prefix/src/rocksdb/utilities/write_batch_with_index/write_batch_with_index_internal.cc"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
       <item path="bld/fdbserver/storageserver.actor.g.cpp"
             ex="false"
             tool="1"
@@ -5014,7 +5085,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -5031,7 +5102,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -5048,7 +5119,7 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
           </preprocessorList>
@@ -5461,6 +5532,13 @@
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/PopulateTPCC.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="4">
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/ProtocolVersion.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
@@ -5926,6 +6004,18 @@
           </preprocessorList>
         </ccTool>
       </item>
+      <item path="bld/toml11Project-prefix/src/toml11Project-build/CMakeFiles/3.18.3/CompilerIdC/CMakeCCompilerId.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="bld/toml11Project-prefix/src/toml11Project-build/CMakeFiles/3.18.3/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="8">
+        </ccTool>
+      </item>
       <item path="build/cmake/package_tester/fdb_c_app/app.c"
             ex="false"
             tool="0"
@@ -5977,11 +6067,17 @@
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/bindings/c/test">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
@@ -6042,17 +6138,17 @@
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
       <folder path="0/bld/CMakeFiles">
         <ccTool>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
@@ -6069,14 +6165,16 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
       <folder path="0/bld/documentation">
         <ccTool>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -6084,7 +6182,7 @@
       <folder path="0/bld/fdbbackup">
         <ccTool>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -6092,7 +6190,6 @@
       <folder path="0/bld/fdbcli">
         <ccTool>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -6103,7 +6200,6 @@
             <pElem>fdbrpc/libeio</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
             <Elem>HAVE_OPENSSL</Elem>
           </preprocessorList>
         </ccTool>
@@ -6111,7 +6207,9 @@
       <folder path="0/bld/fdbserver/rocksdb-prefix">
         <ccTool>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
@@ -6153,16 +6251,26 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>DTRACE_PROBES</Elem>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/bld/flow">
+        <ccTool>
+          <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
       <folder path="0/bld/toml11Project-prefix">
         <ccTool>
           <preprocessorList>
+            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>TLS_DISABLED</Elem>
+            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
@@ -6366,15 +6474,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6413,15 +6519,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6466,15 +6570,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6508,15 +6610,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6534,15 +6634,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6557,15 +6655,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6576,15 +6672,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6609,15 +6703,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6628,15 +6720,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6647,15 +6737,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6742,15 +6830,13 @@
             <pElem>fdbrpc/libeio</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6782,15 +6868,13 @@
             <pElem>fdbrpc/libeio</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6806,15 +6890,13 @@
             <pElem>fdbrpc/libeio</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6826,15 +6908,13 @@
             <pElem>fdbrpc/libeio</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6846,15 +6926,13 @@
             <pElem>fdbrpc/libeio</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -6914,15 +6992,13 @@
             <pElem>fdbrpc/libeio</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7003,16 +7079,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7116,16 +7190,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7142,16 +7214,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7204,16 +7274,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7304,16 +7372,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7349,16 +7415,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7455,16 +7519,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7705,16 +7767,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -7818,16 +7878,14 @@
             <pElem>bld/toml11/include</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -8278,6 +8336,23 @@
         <cTool flags="3">
         </cTool>
       </item>
+      <item path="flow/Histogram.cpp" ex="false" tool="1" flavor2="11">
+        <ccTool flags="4">
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>bld</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
+            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
+            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
+            <Elem>CMAKE_BUILD</Elem>
+            <Elem>HAVE_OPENSSL</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>NO_INTELLISENSE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
       <item path="flow/IThreadPool.cpp" ex="false" tool="1" flavor2="11">
         <ccTool flags="4">
           <incDir>
@@ -8561,15 +8636,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -8781,15 +8854,13 @@
             <pElem>bld</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
             <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
         </ccTool>
       </item>

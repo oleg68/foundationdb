@@ -5,7 +5,7 @@
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
             <name>foundationdb</name>
             <c-extensions>c</c-extensions>
-            <cpp-extensions>cc,cpp,cxx</cpp-extensions>
+            <cpp-extensions>cc,cpp</cpp-extensions>
             <header-extensions>h,hpp,inc,linux</header-extensions>
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects/>
