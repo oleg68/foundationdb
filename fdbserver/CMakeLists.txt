@@ -98,6 +98,8 @@ set(FDBSERVER_SRCS
   StorageMetrics.actor.h
   StorageMetrics.h
   storageserver.actor.cpp
+  StreamingInterface.h
+  StreamingWorker.actor.cpp
   TagPartitionedLogSystem.actor.cpp
   template_fdb.h
   tester.actor.cpp
