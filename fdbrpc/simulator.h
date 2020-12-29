@@ -119,6 +119,7 @@ public:
 				case ProcessClass::RatekeeperClass: return false;
 				case ProcessClass::StorageCacheClass: return false;
 				case ProcessClass::BackupClass: return false;
+				case ProcessClass::StreamingClass: return false;
 				default: return false;
 			}
 		}
