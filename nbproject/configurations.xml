@@ -3080,6 +3080,33 @@
           </preprocessorList>
         </ccTool>
       </item>
+      <item path="bld/fdbserver/StreamingWorker.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="4">
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>bld</pElem>
+            <pElem>bindings/c</pElem>
+            <pElem>bld/bindings/c</pElem>
+            <pElem>bld/fdbserver/workloads</pElem>
+            <pElem>fdbserver/workloads</pElem>
+            <pElem>bld/fdbserver/rocksdb-prefix/src/rocksdb/include</pElem>
+            <pElem>bld/toml11/include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>BOOST_BIND_GLOBAL_PLACEHOLDERS</Elem>
+            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
+            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
+            <Elem>CMAKE_BUILD</Elem>
+            <Elem>HAVE_OPENSSL</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>NO_INTELLISENSE</Elem>
+            <Elem>SSD_ROCKSDB_EXPERIMENTAL</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
       <item path="bld/fdbserver/TLogServer.actor.g.cpp"
             ex="false"
             tool="1"
