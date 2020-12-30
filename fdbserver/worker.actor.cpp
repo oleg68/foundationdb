@@ -33,6 +33,7 @@
 #include "fdbserver/MetricLogger.h"
 #include "fdbserver/BackupInterface.h"
 #include "fdbserver/WorkerInterface.actor.h"
+#include "fdbserver/StreamingInterface.h"
 #include "fdbserver/IKeyValueStore.h"
 #include "fdbserver/WaitFailure.h"
 #include "fdbserver/TesterInterface.actor.h"  // for poisson()
@@ -958,6 +959,7 @@ ACTOR Future<Void> workerServer(
 	state std::map<SharedLogsKey, SharedLogsValue> sharedLogs;
 	state Reference<AsyncVar<UID>> activeSharedTLog(new AsyncVar<UID>());
 	state WorkerCache<InitializeBackupReply> backupWorkerCache;
+	state WorkerCache<InitializeStreamingReply> streamingWorkerCache;
 
 	state std::string coordFolder = abspath(_coordFolder);
 
@@ -1294,6 +1296,26 @@ ACTOR Future<Void> workerServer(
 					backupReady.send(reply);
 				} else {
 					forwardPromise(req.reply, backupWorkerCache.get(req.reqId));
+				}
+			}
+			when (InitializeStreamingRequest req = waitNext(interf.streaming.getFuture())) {
+				if (!streamingWorkerCache.exists(req.reqId)) {
+					StreamingInterface recruited(locality);
+					recruited.initEndpoints();
+
+					startRole(Role::STREAMING, recruited.id(), interf.id());
+					DUMPTOKEN(recruited.waitFailure);
+
+					ReplyPromise<InitializeStreamingReply> streamingReady = req.reply;
+					streamingWorkerCache.set(req.reqId, streamingReady.getFuture());
+					Future<Void> streamingProcess = streamingWorker(recruited, req, dbInfo);
+					streamingProcess = storageCache.removeOnReady(req.reqId, streamingProcess);
+					errorForwarders.add(forwardError(errors, Role::STREAMING, recruited.id(), streamingProcess));
+					TraceEvent("StreamingInitRequest", req.reqId).detail("StreamingId", recruited.id());
+					InitializeStreamingReply reply(recruited, req.streamingEpoch);
+					streamingReady.send(reply);
+				} else {
+					forwardPromise(req.reply, streamingWorkerCache.get(req.reqId));
 				}
 			}
 			when( InitializeTLogRequest req = waitNext(interf.tLog.getFuture()) ) {
@@ -1892,3 +1914,4 @@ const Role Role::RATEKEEPER("Ratekeeper", "RK");
 const Role Role::STORAGE_CACHE("StorageCache", "SC");
 const Role Role::COORDINATOR("Coordinator", "CD");
 const Role Role::BACKUP("Backup", "BK");
+const Role Role::STREAMING("Streaming", "ST");

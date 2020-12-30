@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+
 #ifndef FDBSERVER_STREAMINGINTERFACE_H
 #define FDBSERVER_STREAMINGINTERFACE_H
 
@@ -37,17 +37,17 @@ struct StreamingInterface {
 	UID id() const { return getToken(); }
 	NetworkAddress address() const { return waitFailure.getEndpoint().getPrimaryAddress(); }
 	UID getToken() const { return waitFailure.getEndpoint().token; }
-	bool operator== (const BackupInterface& r) const {
+	bool operator== (const StreamingInterface& r) const {
 		return getToken() == r.getToken();
 	}
-	bool operator!= (const BackupInterface& r) const {
+	bool operator!= (const StreamingInterface& r) const {
 		return !(*this == r);
 	}
 
 	template <class Archive>
 	void serialize(Archive& ar) {
-//		serializer(ar, waitFailure, locality);
+		serializer(ar, waitFailure, locality);
 	}
 };
+
 #endif //FDBSERVER_STREAMINGINTERFACE_H
-*/

@@ -19,7 +19,6 @@
  * limitations under the License.
  */
 
-/*
 #include "fdbclient/Notified.h"
 #include "fdbserver/StreamingInterface.h"
 #include "fdbserver/LogSystem.h"
@@ -52,7 +51,7 @@ ACTOR Future<Void> pullAsyncData(StreamingData* self) {
 
 	loop {
 		loop choose {
-			when (wait(r ? r->getMore(TaskTLogCommit) : Never())) {
+			when (wait(r ? r->getMore(TaskPriority::TLogCommit) : Never())) {
 				break;
 			}
 			when (wait(logSystemChange)) {
@@ -73,7 +72,7 @@ ACTOR Future<Void> pullAsyncData(StreamingData* self) {
 		state Version ver = 0;
 		while (r->hasMessage()) {
 			lastVersion = r->version().version;
-			self->messages.emplace_back(r->getMessage(), std::vector<Tag>());
+			self->messages.emplace_back(r->getMessage(), VectorRef<Tag>());
 			r->nextMessage();
 		}
 
@@ -82,10 +81,10 @@ ACTOR Future<Void> pullAsyncData(StreamingData* self) {
 }
 
 ACTOR Future<Void> streamingWorker(
-	BackupInterface interf, InitializeStreamingRequest req,
+	StreamingInterface interf, InitializeStreamingRequest req,
 	Reference<AsyncVar<ServerDBInfo>> db)
 {
-	state BackupData self(interf.id(), req);
+	state StreamingData self(interf.id(), req);
 	state PromiseStream<Future<Void>> addActor;
 	state Future<Void> error = actorCollection( addActor.getFuture() );
 	state Future<Void> dbInfoChange = Void();
@@ -111,4 +110,3 @@ ACTOR Future<Void> streamingWorker(
 	}
 	return Void();
 }
- */

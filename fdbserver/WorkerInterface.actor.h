@@ -28,6 +28,7 @@
 #include "fdbserver/BackupInterface.h"
 #include "fdbserver/DataDistributorInterface.h"
 #include "fdbserver/MasterInterface.h"
+#include "fdbserver/StreamingInterface.h"
 #include "fdbserver/TLogInterface.h"
 #include "fdbserver/RatekeeperInterface.h"
 #include "fdbserver/ResolverInterface.h"
@@ -54,6 +55,7 @@ struct WorkerInterface {
 	RequestStream< struct InitializeStorageRequest > storage;
 	RequestStream< struct InitializeLogRouterRequest > logRouter;
 	RequestStream< struct InitializeBackupRequest > backup;
+	RequestStream< struct InitializeStreamingRequest > streaming;
 
 	RequestStream< struct LoadedPingRequest > debugPing;
 	RequestStream< struct CoordinationPingMessage > coordinationPing;
@@ -96,7 +98,7 @@ struct WorkerInterface {
 		serializer(ar, clientInterface, locality, tLog, master, commitProxy, grvProxy, dataDistributor, ratekeeper,
 		           resolver, storage, logRouter, debugPing, coordinationPing, waitFailure, setMetricsRate,
 		           eventLogRequest, traceBatchDumpRequest, testerInterface, diskStoreRequest, execReq, workerSnapReq,
-		           backup, updateServerDBInfo);
+		           backup, updateServerDBInfo, streaming);
 	}
 };
 
@@ -419,6 +421,41 @@ struct InitializeBackupRequest {
 	}
 };
 
+struct InitializeStreamingReply {
+	constexpr static FileIdentifier file_identifier = 13511910;
+	struct StreamingInterface interf;
+	LogEpoch streamingEpoch;
+
+	InitializeStreamingReply() = default;
+	InitializeStreamingReply(StreamingInterface interface, LogEpoch e) : interf(interface), streamingEpoch(e) {}
+
+	template <class Ar>
+	void serialize(Ar& ar) {
+		serializer(ar, interf, streamingEpoch);
+	}
+};
+
+struct InitializeStreamingRequest {
+	constexpr static FileIdentifier file_identifier = 1245416;
+	UID reqId;
+	LogEpoch recruitedEpoch; // The epoch the worker is recruited.
+	LogEpoch streamingEpoch; // The epoch the worker should work on. If different from the recruitedEpoch, then it refers
+	                      // to some previous epoch with unfinished work.
+	Tag routerTag;
+	int totalTags;
+	Version startVersion;
+	Optional<Version> endVersion;
+	ReplyPromise<struct InitializeStreamingReply> reply;
+
+	InitializeStreamingRequest() = default;
+	explicit InitializeStreamingRequest(UID id) : reqId(id) {}
+
+	template <class Ar>
+	void serialize(Ar& ar) {
+		serializer(ar, reqId, recruitedEpoch, streamingEpoch, routerTag, totalTags, startVersion, endVersion, reply);
+	}
+};
+
 // FIXME: Rename to InitializeMasterRequest, etc
 struct RecruitMasterRequest {
 	constexpr static FileIdentifier file_identifier = 12684574;
@@ -687,6 +724,7 @@ struct Role {
 	static const Role STORAGE_CACHE;
 	static const Role COORDINATOR;
 	static const Role BACKUP;
+	static const Role STREAMING;
 
 	std::string roleName;
 	std::string abbreviation;
@@ -754,6 +792,7 @@ ACTOR Future<Void> dataDistributor(DataDistributorInterface ddi, Reference<Async
 ACTOR Future<Void> ratekeeper(RatekeeperInterface rki, Reference<AsyncVar<ServerDBInfo>> db);
 ACTOR Future<Void> storageCacheServer(StorageServerInterface interf, uint16_t id, Reference<AsyncVar<ServerDBInfo>> db);
 ACTOR Future<Void> backupWorker(BackupInterface bi, InitializeBackupRequest req, Reference<AsyncVar<ServerDBInfo>> db);
+ACTOR Future<Void> streamingWorker(StreamingInterface bi, InitializeStreamingRequest req, Reference<AsyncVar<ServerDBInfo>> db);
 
 void registerThreadForProfiling();
 void updateCpuProfiler(ProfilerRequest req);
