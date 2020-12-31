@@ -187,6 +187,9 @@ struct DatabaseConfiguration {
 	// Backup Workers
 	bool backupWorkerEnabled;
 
+	// Streaming Workers
+	bool streamingWorkerEnabled;
+
 	//Data centers
 	int32_t usableRegions;
 	int32_t repopulateRegionAntiQuorum;

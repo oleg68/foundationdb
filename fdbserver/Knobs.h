@@ -330,6 +330,7 @@ public:
 	double PROVISIONAL_DELAY_GROWTH;
 	double PROVISIONAL_MAX_DELAY;
 	double SECONDS_BEFORE_RECRUIT_BACKUP_WORKER;
+	double SECONDS_BEFORE_RECRUIT_STREAMING_WORKER;
 	double CC_INTERFACE_TIMEOUT;
 
 	// Resolver
@@ -345,6 +346,9 @@ public:
 	int BACKUP_FILE_BLOCK_BYTES;
 	int64_t BACKUP_LOCK_BYTES;
 	double BACKUP_UPLOAD_DELAY;
+
+	// Streamin Worker
+	double STREAMING_TIMEOUT;  // master's reaction time for backup failure
 
 	//Cluster Controller
 	double CLUSTER_CONTROLLER_LOGGING_DELAY;

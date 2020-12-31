@@ -96,6 +96,7 @@ ERROR( master_backup_worker_failed, 1212, "Master terminating because a backup w
 ERROR( tag_throttled, 1213, "Transaction tag is being throttled" )
 ERROR( grv_proxy_failed, 1214, "Master terminating because a GRV CommitProxy failed" )
 ERROR( dd_tracker_cancelled, 1215, "The data distribution tracker has been cancelled" )
+ERROR( master_streaming_worker_failed, 1216, "Master terminating because a streaming worker failed")
 
 // 15xx Platform errors
 ERROR( platform_error, 1500, "Platform error" )

@@ -178,6 +178,7 @@ struct TagPartitionedLogSystem : ILogSystem, ReferenceCounted<TagPartitionedLogS
 	std::set<int8_t> pseudoLocalities; // Represent special localities that will be mapped to tagLocalityLogRouter
 	const LogEpoch epoch;
 	LogEpoch oldestBackupEpoch;
+	LogEpoch oldestStreamingEpoch;
 
 	// new members
 	std::map<Tag, Version> pseudoLocalityPopVersion;
@@ -191,6 +192,8 @@ struct TagPartitionedLogSystem : ILogSystem, ReferenceCounted<TagPartitionedLogS
 	bool hasRemoteServers;
 	AsyncTrigger backupWorkerChanged;
 	std::set<UID> removedBackupWorkers; // Workers that are removed before setting them.
+	AsyncTrigger streamingWorkerChanged;
+	std::set<UID> removedStreamingWorkers; // Workers that are removed before setting them.
 
 	Optional<Version> recoverAt;
 	Optional<Version> recoveredAt;
@@ -213,7 +216,7 @@ struct TagPartitionedLogSystem : ILogSystem, ReferenceCounted<TagPartitionedLogS
 	TagPartitionedLogSystem(UID dbgid, LocalityData locality, LogEpoch e,
 	                        Optional<PromiseStream<Future<Void>>> addActor = Optional<PromiseStream<Future<Void>>>())
 	  : dbgid(dbgid), logSystemType(LogSystemType::empty), expectedLogSets(0), logRouterTags(0), txsTags(0),
-	    repopulateRegionAntiQuorum(0), epoch(e), oldestBackupEpoch(0), recoveryCompleteWrittenToCoreState(false),
+	    repopulateRegionAntiQuorum(0), epoch(e), oldestBackupEpoch(0), oldestStreamingEpoch(0), recoveryCompleteWrittenToCoreState(false),
 	    locality(locality), remoteLogsWrittenToCoreState(false), hasRemoteServers(false), stopped(false),
 	    addActor(addActor), popActors(false) {}
 
@@ -323,6 +326,7 @@ struct TagPartitionedLogSystem : ILogSystem, ReferenceCounted<TagPartitionedLogS
 
 		logSystem->logSystemType = lsConf.logSystemType;
 		logSystem->oldestBackupEpoch = lsConf.oldestBackupEpoch;
+		logSystem->oldestStreamingEpoch = lsConf.oldestStreamingEpoch;
 		return logSystem;
 	}
 
@@ -1567,6 +1571,75 @@ struct TagPartitionedLogSystem : ILogSystem, ReferenceCounted<TagPartitionedLogS
 	void setOldestBackupEpoch(LogEpoch epoch) final {
 		oldestBackupEpoch = epoch;
 		backupWorkerChanged.trigger();
+	}
+
+	void setStreamingWorkers(const std::vector<InitializeStreamingReply>& replies) final {
+		ASSERT(tLogs.size() > 0);
+
+		Reference<LogSet> logset = tLogs[0];  // Master recruits this epoch's worker first.
+		LogEpoch logsetEpoch = this->epoch;
+		oldestStreamingEpoch = this->epoch;
+		for (const auto& reply : replies) {
+			if (removedStreamingWorkers.count(reply.interf.id()) > 0) {
+				removedStreamingWorkers.erase(reply.interf.id());
+				continue;
+			}
+			auto worker = makeReference<AsyncVar<OptionalInterface<StreamingInterface>>>(
+			    OptionalInterface<StreamingInterface>(reply.interf));
+			if (reply.streamingEpoch != logsetEpoch) {
+				// find the logset from oldLogData
+				logsetEpoch = reply.streamingEpoch;
+				oldestStreamingEpoch = std::min(oldestStreamingEpoch, logsetEpoch);
+				logset = getEpochLogSet(logsetEpoch);
+				ASSERT(logset.isValid());
+			}
+			logset->streamingWorkers.push_back(worker);
+			TraceEvent("AddBackupWorker", dbgid)
+			    .detail("Epoch", logsetEpoch)
+			    .detail("StreamingWorkerID", reply.interf.id());
+		}
+		TraceEvent("SetOldestStreamingEpoch", dbgid).detail("Epoch", oldestStreamingEpoch);
+		streamingWorkerChanged.trigger();
+	}
+
+	bool removeStreamingWorker(const StreamingWorkerDoneRequest& req) final {
+		bool removed = false;
+		Reference<LogSet> logset = getEpochLogSet(req.streamingEpoch);
+		if (logset.isValid()) {
+			for (auto it = logset->streamingWorkers.begin(); it != logset->streamingWorkers.end(); it++) {
+				if (it->getPtr()->get().interf().id() == req.workerUID) {
+					logset->streamingWorkers.erase(it);
+					removed = true;
+					break;
+				}
+			}
+		}
+
+		if (removed) {
+			oldestStreamingEpoch = epoch;
+			for (const auto& old : oldLogData) {
+				if (old.epoch < oldestStreamingEpoch && old.tLogs[0]->streamingWorkers.size() > 0) {
+					oldestStreamingEpoch = old.epoch;
+				}
+			}
+			streamingWorkerChanged.trigger();
+		} else {
+			removedStreamingWorkers.insert(req.workerUID);
+		}
+
+		TraceEvent("RemoveStreamingWorker", dbgid)
+		    .detail("Removed", removed)
+		    .detail("StreamingEpoch", req.streamingEpoch)
+		    .detail("WorkerID", req.workerUID)
+		    .detail("OldestStreamingEpoch", oldestStreamingEpoch);
+		return removed;
+	}
+
+	LogEpoch getOldestStreamingEpoch() const final { return oldestStreamingEpoch; }
+
+	void setOldestStreamingEpoch(LogEpoch epoch) final {
+		oldestStreamingEpoch = epoch;
+		streamingWorkerChanged.trigger();
 	}
 
 	ACTOR static Future<Void> monitorLog(Reference<AsyncVar<OptionalInterface<TLogInterface>>> logServer, Reference<AsyncVar<bool>> failed) {

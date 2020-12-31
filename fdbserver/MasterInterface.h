@@ -215,6 +215,21 @@ struct BackupWorkerDoneRequest {
 	}
 };
 
+struct StreamingWorkerDoneRequest {
+	constexpr static FileIdentifier file_identifier = 8736352;
+	UID workerUID;
+	LogEpoch streamingEpoch;
+	ReplyPromise<Void> reply;
+
+	StreamingWorkerDoneRequest() : workerUID(), streamingEpoch(-1) {}
+	StreamingWorkerDoneRequest(UID id, LogEpoch epoch) : workerUID(id), streamingEpoch(epoch) {}
+
+	template <class Ar>
+	void serialize(Ar& ar) {
+		serializer(ar, workerUID, streamingEpoch, reply);
+	}
+};
+
 struct LifetimeToken {
 	UID ccID;
 	int64_t count;

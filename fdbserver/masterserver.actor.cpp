@@ -239,6 +239,7 @@ struct MasterData : NonCopyable, ReferenceCounted<MasterData> {
 	int8_t primaryLocality;
 
 	std::vector<WorkerInterface> backupWorkers; // Recruited backup workers from cluster controller.
+	std::vector<WorkerInterface> streamingWorkers; // Recruited streaming workers from cluster controller.
 
 	MasterData(Reference<AsyncVar<ServerDBInfo>> const& dbInfo, MasterInterface const& myInterface,
 	           ServerCoordinators const& coordinators, ClusterControllerFullInterface const& clusterController,
@@ -651,6 +652,7 @@ ACTOR Future<vector<Standalone<CommitTransactionRef>>> recruitEverything( Refere
 	    .detail("TLogs", recruits.tLogs.size())
 	    .detail("Resolvers", recruits.resolvers.size())
 	    .detail("BackupWorkers", self->backupWorkers.size())
+	    .detail("StreamingWorkers", self->streamingWorkers.size())
 	    .trackLatest("MasterRecoveryState");
 
 	// Actually, newSeedServers does both the recruiting and initialization of the seed servers; so if this is a brand new database we are sort of lying that we are
@@ -1436,6 +1438,97 @@ ACTOR static Future<Void> recruitBackupWorkers(Reference<MasterData> self, Datab
 	return Void();
 }
 
+ACTOR static Future<Void> recruitStreamingWorkers(Reference<MasterData> self, Database cx) {
+	ASSERT(self->streamingWorkers.size() > 0);
+
+	// Avoid race between a streaming worker's save progress and the reads below.
+	wait(delay(SERVER_KNOBS->SECONDS_BEFORE_RECRUIT_STREAMING_WORKER));
+
+	state LogEpoch epoch = self->cstate.myDBState.recoveryCount;
+	/*
+	state Reference<BackupProgress> streamingProgress(
+	    new BackupProgress(self->dbgid, self->logSystem->getOldEpochTagsVersionsInfo()));
+	state Future<Void> gotProgress = getBackupProgress(cx, self->dbgid, backupProgress, true);
+	*/
+	state std::vector<Future<InitializeStreamingReply>> initializationReplies;
+
+	state std::vector<std::pair<UID, Tag>> idsTags; // worker IDs and tags for current epoch
+	state int logRouterTags = self->logSystem->getLogRouterTags();
+	for (int i = 0; i < logRouterTags; i++) {
+		idsTags.emplace_back(deterministicRandom()->randomUniqueID(), Tag(tagLocalityLogRouter, i));
+	}
+
+	const Version startVersion = self->logSystem->getBackupStartVersion();
+	state int i = 0;
+	for (; i < logRouterTags; i++) {
+		const auto& worker = self->streamingWorkers[i % self->streamingWorkers.size()];
+		InitializeStreamingRequest req(idsTags[i].first);
+		req.recruitedEpoch = epoch;
+		req.streamingEpoch = epoch;
+		req.routerTag = idsTags[i].second;
+		req.totalTags = logRouterTags;
+		req.startVersion = startVersion;
+		TraceEvent("StreamingRecruitment", self->dbgid)
+		    .detail("RequestID", req.reqId)
+		    .detail("Tag", req.routerTag.toString())
+		    .detail("Epoch", epoch)
+		    .detail("StreamingEpoch", epoch)
+		    .detail("StartVersion", req.startVersion);
+		initializationReplies.push_back(
+		    transformErrors(throwErrorOr(worker.streaming.getReplyUnlessFailedFor(
+		                        req, SERVER_KNOBS->STREAMING_TIMEOUT, SERVER_KNOBS->MASTER_FAILURE_SLOPE_DURING_RECOVERY)),
+		                    master_streaming_worker_failed()));
+	}
+
+	/*
+	state Future<Optional<Version>> fMinVersion = getMinStreamingVersion(self, cx);
+	wait(gotProgress && success(fMinVersion));
+	TraceEvent("MinBackupVersion", self->dbgid).detail("Version", fMinVersion.get().present() ? fMinVersion.get() : -1);
+
+	std::map<std::tuple<LogEpoch, Version, int>, std::map<Tag, Version>> toRecruit =
+	    backupProgress->getUnfinishedBackup();
+	for (const auto& [epochVersionTags, tagVersions] : toRecruit) {
+		const Version oldEpochEnd = std::get<1>(epochVersionTags);
+		if (!fMinVersion.get().present() || fMinVersion.get().get() + 1 >= oldEpochEnd) {
+			TraceEvent("SkipBackupRecruitment", self->dbgid)
+			    .detail("MinVersion", fMinVersion.get().present() ? fMinVersion.get() : -1)
+			    .detail("Epoch", epoch)
+			    .detail("OldEpoch", std::get<0>(epochVersionTags))
+			    .detail("OldEpochEnd", oldEpochEnd);
+			continue;
+		}
+		for (const auto& [tag, version] : tagVersions) {
+			const auto& worker = self->backupWorkers[i % self->backupWorkers.size()];
+			i++;
+			InitializeBackupRequest req(deterministicRandom()->randomUniqueID());
+			req.recruitedEpoch = epoch;
+			req.backupEpoch = std::get<0>(epochVersionTags);
+			req.routerTag = tag;
+			req.totalTags = std::get<2>(epochVersionTags);
+			req.startVersion = version; // savedVersion + 1
+			req.endVersion = std::get<1>(epochVersionTags) - 1;
+			TraceEvent("BackupRecruitment", self->dbgid)
+			    .detail("RequestID", req.reqId)
+			    .detail("Tag", req.routerTag.toString())
+			    .detail("Epoch", epoch)
+			    .detail("BackupEpoch", req.backupEpoch)
+			    .detail("StartVersion", req.startVersion)
+			    .detail("EndVersion", req.endVersion.get());
+			initializationReplies.push_back(transformErrors(
+			    throwErrorOr(worker.backup.getReplyUnlessFailedFor(req, SERVER_KNOBS->BACKUP_TIMEOUT,
+			                                                       SERVER_KNOBS->MASTER_FAILURE_SLOPE_DURING_RECOVERY)),
+			    master_backup_worker_failed()));
+		}
+	}
+	*/
+
+	std::vector<InitializeStreamingReply> newRecruits = wait(getAll(initializationReplies));
+	self->logSystem->setStreamingWorkers(newRecruits);
+	TraceEvent("StreamingRecruitmentDone", self->dbgid);
+	self->registrationTrigger.trigger();
+	return Void();
+}
+
 ACTOR Future<Void> masterCore( Reference<MasterData> self ) {
 	state TraceInterval recoveryInterval("MasterRecovery");
 	state double recoverStartTime = now();
@@ -1698,6 +1791,12 @@ ACTOR Future<Void> masterCore( Reference<MasterData> self ) {
 	} else {
 		self->logSystem->setOldestBackupEpoch(self->cstate.myDBState.recoveryCount);
 	}
+	if (self->configuration.streamingWorkerEnabled) {
+		self->addActor.send(recruitStreamingWorkers(self, cx));
+	} else {
+		self->logSystem->setOldestStreamingEpoch(self->cstate.myDBState.recoveryCount);
+	}
+
 
 	wait( Future<Void>(Never()) );
 	throw internal_error();

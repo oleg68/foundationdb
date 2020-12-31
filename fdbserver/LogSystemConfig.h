@@ -23,6 +23,7 @@
 #pragma once
 
 #include "fdbserver/BackupInterface.h"
+#include "fdbserver/StreamingInterface.h"
 #include "fdbserver/TLogInterface.h"
 #include "fdbrpc/ReplicationPolicy.h"
 #include "fdbclient/DatabaseConfiguration.h"
@@ -84,6 +85,7 @@ struct TLogSet {
 	std::vector<OptionalInterface<TLogInterface>> tLogs;
 	std::vector<OptionalInterface<TLogInterface>> logRouters;
 	std::vector<OptionalInterface<BackupInterface>> backupWorkers;
+	std::vector<OptionalInterface<StreamingInterface>> streamingWorkers;
 	int32_t tLogWriteAntiQuorum, tLogReplicationFactor;
 	std::vector< LocalityData > tLogLocalities; // Stores the localities of the log servers
 	TLogVersion tLogVersion;
@@ -106,7 +108,9 @@ struct TLogSet {
 		if (tLogWriteAntiQuorum != rhs.tLogWriteAntiQuorum || tLogReplicationFactor != rhs.tLogReplicationFactor ||
 		    isLocal != rhs.isLocal || satelliteTagLocations != rhs.satelliteTagLocations ||
 		    startVersion != rhs.startVersion || tLogs.size() != rhs.tLogs.size() || locality != rhs.locality ||
-		    logRouters.size() != rhs.logRouters.size() || backupWorkers.size() != rhs.backupWorkers.size()) {
+		    logRouters.size() != rhs.logRouters.size() || backupWorkers.size() != rhs.backupWorkers.size()
+		    || streamingWorkers.size() != rhs.streamingWorkers.size()
+		) {
 			return false;
 		}
 		if ((tLogPolicy && !rhs.tLogPolicy) || (!tLogPolicy && rhs.tLogPolicy) || (tLogPolicy && (tLogPolicy->info() != rhs.tLogPolicy->info()))) {
@@ -127,6 +131,14 @@ struct TLogSet {
 			    backupWorkers[j].present() != rhs.backupWorkers[j].present() ||
 			    (backupWorkers[j].present() &&
 			     backupWorkers[j].interf().getToken() != rhs.backupWorkers[j].interf().getToken())) {
+				return false;
+			}
+		}
+		for (int j = 0; j < streamingWorkers.size(); j++) {
+			if (streamingWorkers[j].id() != rhs.streamingWorkers[j].id() ||
+			    streamingWorkers[j].present() != rhs.streamingWorkers[j].present() ||
+			    (streamingWorkers[j].present() &&
+			     streamingWorkers[j].interf().getToken() != rhs.streamingWorkers[j].interf().getToken())) {
 				return false;
 			}
 		}
@@ -152,7 +164,7 @@ struct TLogSet {
 	template <class Ar>
 	void serialize( Ar& ar ) {
 		serializer(ar, tLogs, logRouters, tLogWriteAntiQuorum, tLogReplicationFactor, tLogPolicy, tLogLocalities,
-		           isLocal, locality, startVersion, satelliteTagLocations, tLogVersion, backupWorkers);
+		           isLocal, locality, startVersion, satelliteTagLocations, tLogVersion, backupWorkers, streamingWorkers);
 	}
 };
 
@@ -219,10 +231,11 @@ struct LogSystemConfig {
 	std::set<int8_t> pseudoLocalities;
 	LogEpoch epoch;
 	LogEpoch oldestBackupEpoch;
+	LogEpoch oldestStreamingEpoch;
 
 	LogSystemConfig(LogEpoch e = 0)
 	  : logSystemType(LogSystemType::empty), logRouterTags(0), txsTags(0), expectedLogSets(0), stopped(false), epoch(e),
-	    oldestBackupEpoch(e) {}
+	    oldestBackupEpoch(e), oldestStreamingEpoch(e) {}
 
 	std::string toString() const {
 		return format("type: %d oldGenerations: %d tags: %d %s", logSystemType, oldTLogs.size(), logRouterTags, describe(tLogs).c_str());
@@ -363,7 +376,7 @@ struct LogSystemConfig {
 		return logSystemType == r.logSystemType && tLogs == r.tLogs && oldTLogs == r.oldTLogs &&
 		       expectedLogSets == r.expectedLogSets && logRouterTags == r.logRouterTags && txsTags == r.txsTags &&
 		       recruitmentID == r.recruitmentID && stopped == r.stopped && recoveredAt == r.recoveredAt &&
-		       pseudoLocalities == r.pseudoLocalities && epoch == r.epoch && oldestBackupEpoch == r.oldestBackupEpoch;
+		       pseudoLocalities == r.pseudoLocalities && epoch == r.epoch && oldestBackupEpoch == r.oldestBackupEpoch && oldestStreamingEpoch == r.oldestStreamingEpoch;
 	}
 
 	bool isEqualIds(LogSystemConfig const& r) const {
@@ -440,6 +453,22 @@ struct LogSystemConfig {
 		return false;
 	}
 
+	bool hasStreamingWorker(UID bid) const {
+		for (const auto& log : tLogs) {
+			if (std::count(log.streamingWorkers.begin(), log.streamingWorkers.end(), bid) > 0) {
+				return true;
+			}
+		}
+		for (const auto& old : oldTLogs) {
+			for (const auto& log : old.tLogs) {
+				if (std::count(log.streamingWorkers.begin(), log.streamingWorkers.end(), bid) > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	Version getEpochEndVersion(LogEpoch epoch) const {
 		for (const auto& old : oldTLogs) {
 			if (old.epoch == epoch) {
@@ -452,7 +481,7 @@ struct LogSystemConfig {
 	template <class Ar>
 	void serialize(Ar& ar) {
 		serializer(ar, logSystemType, tLogs, logRouterTags, oldTLogs, expectedLogSets, recruitmentID, stopped,
-		           recoveredAt, pseudoLocalities, txsTags, epoch, oldestBackupEpoch);
+		           recoveredAt, pseudoLocalities, txsTags, epoch, oldestBackupEpoch, oldestStreamingEpoch);
 	}
 };
 

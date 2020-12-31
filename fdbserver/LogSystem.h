@@ -54,6 +54,7 @@ public:
 	std::vector<Reference<AsyncVar<OptionalInterface<TLogInterface>>>> logServers;
 	std::vector<Reference<AsyncVar<OptionalInterface<TLogInterface>>>> logRouters;
 	std::vector<Reference<AsyncVar<OptionalInterface<BackupInterface>>>> backupWorkers;
+	std::vector<Reference<AsyncVar<OptionalInterface<StreamingInterface>>>> streamingWorkers;
 	std::vector<Reference<ConnectionResetInfo>> connectionResetTrackers;
 	int32_t tLogWriteAntiQuorum;
 	int32_t tLogReplicationFactor;
@@ -95,6 +96,15 @@ public:
 
 	bool hasBackupWorker(UID id) const {
 		for (const auto& worker : backupWorkers) {
+			if (worker->get().id() == id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool hasStreamingWorker(UID id) const {
+		for (const auto& worker : streamingWorkers) {
 			if (worker->get().id() == id) {
 				return true;
 			}
@@ -805,6 +815,15 @@ struct ILogSystem {
 
 	virtual LogEpoch getOldestBackupEpoch() const = 0;
 	virtual void setOldestBackupEpoch(LogEpoch epoch) = 0;
+
+	virtual void setStreamingWorkers(const std::vector<InitializeStreamingReply>& replies) = 0;
+
+	// Removes a finished streaming worker from log system and returns true. Returns false
+	// if the worker is not found.
+	virtual bool removeStreamingWorker(const StreamingWorkerDoneRequest& req) = 0;
+
+	virtual LogEpoch getOldestStreamingEpoch() const = 0;
+	virtual void setOldestStreamingEpoch(LogEpoch epoch) = 0;
 };
 
 struct LengthPrefixedStringRef {
