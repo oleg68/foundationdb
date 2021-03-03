@@ -98,7 +98,10 @@ enum {
 	OPT_DUMP_BEGIN, OPT_DUMP_END, OPT_JSON, OPT_DELETE_DATA, OPT_MIN_CLEANUP_SECONDS,
 
 	// Backup and Restore constants
-	OPT_TAGNAME, OPT_BACKUPKEYS, OPT_WAITFORDONE,
+	OPT_TAGNAME,
+	OPT_BACKUPKEYS,
+	OPT_WAITFORDONE,
+	OPT_INCREMENTALONLY,
 
 	// Backup Modify
 	OPT_MOD_ACTIVE_INTERVAL, OPT_MOD_VERIFY_UID,
@@ -1020,6 +1023,8 @@ static void printRestoreUsage(bool devhelp ) {
 	printf("  --trace_format FORMAT\n"
 		   "                 Select the format of the trace files. xml (the default) and json are supported.\n"
 		   "                 Has no effect unless --log is specified.\n");
+	printf("  --incremental\n"
+	       "                 Performs incremental restore without the base backup.\n");
 #ifndef TLS_DISABLED
 	printf(TLS_HELP);
 #endif
@@ -2763,6 +2768,7 @@ int main(int argc, char* argv[]) {
 		std::string restoreTimestamp;
 		bool waitForDone = false;
 		bool stopWhenDone = true;
+		bool incrementalBackupOnly = false;
 		bool forceAction = false;
 		bool trace = false;
 		bool quietDisplay = false;
@@ -3007,6 +3013,9 @@ int main(int argc, char* argv[]) {
 					break;
 				case OPT_NOSTOPWHENDONE:
 					stopWhenDone = false;
+					break;
+				case OPT_INCREMENTALONLY:
+					incrementalBackupOnly = true;
 					break;
 				case OPT_RESTORECONTAINER:
 					restoreContainer = args->OptionArg();
