@@ -148,6 +148,7 @@
             <in>FileSystem.actor.g.cpp</in>
             <in>FuzzApiCorrectness.actor.g.cpp</in>
             <in>Increment.actor.g.cpp</in>
+            <in>IncrementalBackup.actor.g.cpp</in>
             <in>IndexScan.actor.g.cpp</in>
             <in>Inventory.actor.g.cpp</in>
             <in>KVStoreTest.actor.g.cpp</in>
@@ -4311,6 +4312,34 @@
         </ccTool>
       </item>
       <item path="bld/fdbserver/workloads/Increment.actor.g.cpp"
+            ex="false"
+            tool="1"
+            flavor2="11">
+        <ccTool flags="1">
+          <incDir>
+            <pElem>fdbserver</pElem>
+            <pElem>bld/fdbserver</pElem>
+            <pElem>bindings/c</pElem>
+            <pElem>bld/bindings/c</pElem>
+            <pElem>bld/fdbserver/workloads</pElem>
+            <pElem>fdbserver/workloads</pElem>
+            <pElem>fdbclient</pElem>
+            <pElem>bld/fdbclient</pElem>
+            <pElem>fdbrpc</pElem>
+            <pElem>bld/fdbrpc</pElem>
+            <pElem>flow</pElem>
+            <pElem>bld/flow</pElem>
+            <pElem>flow/-lpthread</pElem>
+            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DTRACE_PROBES</Elem>
+            <Elem>HAVE_OPENSSL</Elem>
+            <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="bld/fdbserver/workloads/IncrementalBackup.actor.g.cpp"
             ex="false"
             tool="1"
             flavor2="11">
