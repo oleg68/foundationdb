@@ -2807,6 +2807,7 @@ namespace fileBackup {
 					wait(tr->onError(e));
 				}
 			}
+			TraceEvent("FileRestoreLogCheckpoint1");
 
 			state Key mutationLogPrefix = restore.mutationLogPrefix();
 			state Reference<IAsyncFile> inFile = wait(bc->readFile(logFile.fileName));
@@ -2827,9 +2828,15 @@ namespace fileBackup {
 
 					state int i = start;
 					state int txBytes = 0;
+					TraceEvent("FileRestoreLogCheckpoint2")
+						.detail("I", i)
+						.detail("End", end);
 					for(; i < end && txBytes < dataSizeLimit; ++i) {
 						Key k = data[i].key.withPrefix(mutationLogPrefix);
 						ValueRef v = data[i].value;
+						TraceEvent("FileRestoreTrackKV")
+							.detail("K", k)
+							.detail("V", v);
 						tr->set(k, v);
 						txBytes += k.expectedSize();
 						txBytes += v.expectedSize();
@@ -2840,6 +2847,7 @@ namespace fileBackup {
 					wait(taskBucket->keepRunning(tr, task));
 					wait( checkLock );
 
+					TraceEvent("FileRestoreLogCheckpoint3");
 					// Add to bytes written count
 					restore.bytesWritten().atomicOp(tr, txBytes, MutationRef::Type::AddValue);
 
@@ -3085,9 +3093,9 @@ namespace fileBackup {
 						break;
 
 					if(f.isRange) {
-						if (incrementalBackupOnly.get().present() && incrementalBackupOnly.get().get()) {
-							continue;
-						}
+						// if (incrementalBackupOnly.get().present() && incrementalBackupOnly.get().get()) {
+						// 	continue;
+						// }
 						addTaskFutures.push_back(RestoreRangeTaskFunc::addTask(tr, taskBucket, task,
 							f, j, std::min<int64_t>(f.blockSize, f.fileSize - j),
 							TaskCompletionKey::joinWith(allPartsDone)));
@@ -3376,14 +3384,27 @@ namespace fileBackup {
 					wait(tr->onError(e));
 				}
 			}
+			TraceEvent("RestoreCheckpoint1");
+			state Future<Optional<bool>> logsOnly = restore.incrementalBackupOnly().get(tr);
+			wait(success(logsOnly));
+			state bool incremental = false;
+			if (logsOnly.isReady() && logsOnly.get().present() && logsOnly.get().get()) {
+				incremental = true;
+			}
+			Optional<RestorableFileSet> restorable = wait(bc->getRestoreSet(restoreVersion, incremental));
+			state Version beginVer = 0;
+			if (!incremental) {
+				beginVer = restorable.get().snapshot.beginVersion;
+			}
 
-			Optional<RestorableFileSet> restorable = wait(bc->getRestoreSet(restoreVersion));
-
+			TraceEvent("RestoreCheckpoint2")
+				.detail("BeginVer", beginVer)
+				.detail("Incremental", incremental);
 			if(!restorable.present())
 				throw restore_missing_data();
 
 			// First version for which log data should be applied
-			Params.firstVersion().set(task, restorable.get().snapshot.beginVersion);
+			Params.firstVersion().set(task, beginVer);
 
 			// Convert the two lists in restorable (logs and ranges) to a single list of RestoreFiles.
 			// Order does not matter, they will be put in order when written to the restoreFileMap below.
@@ -4238,7 +4259,7 @@ public:
 		if(targetVersion == invalidVersion && desc.maxRestorableVersion.present())
 			targetVersion = desc.maxRestorableVersion.get();
 
-		Optional<RestorableFileSet> restoreSet = wait(bc->getRestoreSet(targetVersion));
+		Optional<RestorableFileSet> restoreSet = wait(bc->getRestoreSet(targetVersion, incrementalBackupOnly));
 
 		if(!restoreSet.present()) {
 			TraceEvent(SevWarn, "FileBackupAgentRestoreNotPossible")
