@@ -3664,8 +3664,8 @@ public:
 
 	ACTOR static Future<Void> submitRestore(FileBackupAgent* backupAgent, Reference<ReadYourWritesTransaction> tr,
 	                                        Key tagName, Key backupURL, Standalone<VectorRef<KeyRangeRef>> ranges,
-	                                        Version restoreVersion, Key addPrefix, Key removePrefix,
-	                                        bool incrementalBackupOnly, bool lockDB, UID uid) {
+	                                        Version restoreVersion, Key addPrefix, Key removePrefix, bool lockDB,
+	                                        bool incrementalBackupOnly, UID uid) {
 		KeyRangeMap<int> restoreRangeSet;
 		for (auto& range : ranges) {
 			restoreRangeSet.insert(range, 1);
@@ -4221,9 +4221,9 @@ public:
 	}
 
 	ACTOR static Future<Version> restore(FileBackupAgent* backupAgent, Database cx, Optional<Database> cxOrig,
-					     Key tagName, Key url, Standalone<VectorRef<KeyRangeRef>> ranges,
-					     bool waitForComplete, Version targetVersion, bool verbose, Key addPrefix,
-					     Key removePrefix, bool incrementalBackupOnly, bool lockDB, UID randomUid) {
+	                                     Key tagName, Key url, Standalone<VectorRef<KeyRangeRef>> ranges,
+	                                     bool waitForComplete, Version targetVersion, bool verbose, Key addPrefix,
+	                                     Key removePrefix, bool lockDB, bool incrementalBackupOnly, UID randomUid) {
 		state Reference<IBackupContainer> bc = IBackupContainer::openContainer(url.toString());
 
 		state BackupDescription desc = wait(bc->describeBackup());
@@ -4255,7 +4255,7 @@ public:
 				tr->setOption(FDBTransactionOptions::ACCESS_SYSTEM_KEYS);
 				tr->setOption(FDBTransactionOptions::LOCK_AWARE);
 				wait(submitRestore(backupAgent, tr, tagName, url, ranges, targetVersion, addPrefix, removePrefix,
-				                   incrementalBackupOnly, lockDB, randomUid));
+				                   lockDB, incrementalBackupOnly, randomUid));
 				wait(tr->commit());
 				break;
 			} catch(Error &e) {
@@ -4372,7 +4372,7 @@ public:
 		Reference<IBackupContainer> bc = wait(backupConfig.backupContainer().getOrThrow(cx));
 
 		TraceEvent("AS_StartRestore");
-		Version ver = wait( restore(backupAgent, cx, cx, tagName, KeyRef(bc->getURL()), ranges, true, -1, true, addPrefix, removePrefix, true, invalidVersion, randomUid) );
+		Version ver = wait( restore(backupAgent, cx, cx, tagName, KeyRef(bc->getURL()), ranges, true, -1, true, addPrefix, removePrefix, true, false, randomUid) );
 		return ver;
 	}
 };
@@ -4384,9 +4384,9 @@ const int FileBackupAgent::dataFooterSize = 20;
 Future<Version> FileBackupAgent::restore(Database cx, Optional<Database> cxOrig, Key tagName, Key url,
                                          Standalone<VectorRef<KeyRangeRef>> ranges, bool waitForComplete,
                                          Version targetVersion, bool verbose, Key addPrefix, Key removePrefix,
-                                         bool incrementalBackupOnly, bool lockDB) {
+                                         bool lockDB, bool incrementalBackupOnly) {
 	return FileBackupAgentImpl::restore(this, cx, cxOrig, tagName, url, ranges, waitForComplete, targetVersion, verbose,
-	                                    addPrefix, removePrefix, incrementalBackupOnly, lockDB,
+	                                    addPrefix, removePrefix, lockDB, incrementalBackupOnly,
 	                                    deterministicRandom()->randomUniqueID());
 }
 
