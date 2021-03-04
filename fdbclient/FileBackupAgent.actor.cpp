@@ -126,6 +126,9 @@ public:
 	KeyBackedProperty<Key> removePrefix() {
 		return configSpace.pack(LiteralStringRef(__FUNCTION__));
 	}
+	KeyBackedProperty<bool> incrementalBackupOnly() {
+		return configSpace.pack(LiteralStringRef(__FUNCTION__));
+	}
 	// XXX: Remove restoreRange() once it is safe to remove. It has been changed to restoreRanges
 	KeyBackedProperty<KeyRange> restoreRange() {
 		return configSpace.pack(LiteralStringRef(__FUNCTION__));
@@ -3380,9 +3383,12 @@ namespace fileBackup {
 			// Convert the two lists in restorable (logs and ranges) to a single list of RestoreFiles.
 			// Order does not matter, they will be put in order when written to the restoreFileMap below.
 			state std::vector<RestoreConfig::RestoreFile> files;
+			state Future<Optional<bool>> incrementalBackupOnly = restore.incrementalBackupOnly().get(tr);
 
-			for(const RangeFile &f : restorable.get().ranges) {
-				files.push_back({f.version, f.fileName, true, f.blockSize, f.fileSize});
+			if (!incrementalBackupOnly.get().present() || !incrementalBackupOnly.get().get()) {
+				for(const RangeFile &f : restorable.get().ranges) {
+					files.push_back({f.version, f.fileName, true, f.blockSize, f.fileSize});
+				}
 			}
 			for(const LogFile &f : restorable.get().logs) {
 				files.push_back({f.beginVersion, f.fileName, false, f.blockSize, f.fileSize, f.endVersion});
@@ -3656,7 +3662,10 @@ public:
 		return Void();
 	}
 
-	ACTOR static Future<Void> submitRestore(FileBackupAgent* backupAgent, Reference<ReadYourWritesTransaction> tr, Key tagName, Key backupURL, Standalone<VectorRef<KeyRangeRef>> ranges, Version restoreVersion, Key addPrefix, Key removePrefix, bool lockDB, UID uid) {
+	ACTOR static Future<Void> submitRestore(FileBackupAgent* backupAgent, Reference<ReadYourWritesTransaction> tr,
+	                                        Key tagName, Key backupURL, Standalone<VectorRef<KeyRangeRef>> ranges,
+	                                        Version restoreVersion, Key addPrefix, Key removePrefix,
+	                                        bool incrementalBackupOnly, bool lockDB, UID uid) {
 		KeyRangeMap<int> restoreRangeSet;
 		for (auto& range : ranges) {
 			restoreRangeSet.insert(range, 1);
@@ -3721,6 +3730,7 @@ public:
 		restore.sourceContainer().set(tr, bc);
 		restore.stateEnum().set(tr, ERestoreState::QUEUED);
 		restore.restoreVersion().set(tr, restoreVersion);
+		restore.incrementalBackupOnly().set(tr, incrementalBackupOnly);
 		if (BUGGIFY && restoreRanges.size() == 1) {
 			restore.restoreRange().set(tr, restoreRanges[0]);
 		}
@@ -4210,7 +4220,10 @@ public:
 		return r;
 	}
 
-	ACTOR static Future<Version> restore(FileBackupAgent* backupAgent, Database cx, Optional<Database> cxOrig, Key tagName, Key url, Standalone<VectorRef<KeyRangeRef>> ranges, bool waitForComplete, Version targetVersion, bool verbose, Key addPrefix, Key removePrefix, bool lockDB, UID randomUid) {
+	ACTOR static Future<Version> restore(FileBackupAgent* backupAgent, Database cx, Optional<Database> cxOrig,
+					     Key tagName, Key url, Standalone<VectorRef<KeyRangeRef>> ranges,
+					     bool waitForComplete, Version targetVersion, bool verbose, Key addPrefix,
+					     Key removePrefix, bool incrementalBackupOnly, bool lockDB, UID randomUid) {
 		state Reference<IBackupContainer> bc = IBackupContainer::openContainer(url.toString());
 
 		state BackupDescription desc = wait(bc->describeBackup());
@@ -4241,7 +4254,8 @@ public:
 			try {
 				tr->setOption(FDBTransactionOptions::ACCESS_SYSTEM_KEYS);
 				tr->setOption(FDBTransactionOptions::LOCK_AWARE);
-				wait(submitRestore(backupAgent, tr, tagName, url, ranges, targetVersion, addPrefix, removePrefix, lockDB, randomUid));
+				wait(submitRestore(backupAgent, tr, tagName, url, ranges, targetVersion, addPrefix, removePrefix,
+				                   incrementalBackupOnly, lockDB, randomUid));
 				wait(tr->commit());
 				break;
 			} catch(Error &e) {
@@ -4358,7 +4372,7 @@ public:
 		Reference<IBackupContainer> bc = wait(backupConfig.backupContainer().getOrThrow(cx));
 
 		TraceEvent("AS_StartRestore");
-		Version ver = wait( restore(backupAgent, cx, cx, tagName, KeyRef(bc->getURL()), ranges, true, -1, true, addPrefix, removePrefix, true, randomUid) );
+		Version ver = wait( restore(backupAgent, cx, cx, tagName, KeyRef(bc->getURL()), ranges, true, -1, true, addPrefix, removePrefix, true, invalidVersion, randomUid) );
 		return ver;
 	}
 };
@@ -4367,8 +4381,13 @@ const std::string BackupAgentBase::defaultTagName = "default";
 const int BackupAgentBase::logHeaderSize = 12;
 const int FileBackupAgent::dataFooterSize = 20;
 
-Future<Version> FileBackupAgent::restore(Database cx, Optional<Database> cxOrig, Key tagName, Key url, Standalone<VectorRef<KeyRangeRef>> ranges, bool waitForComplete, Version targetVersion, bool verbose, Key addPrefix, Key removePrefix, bool lockDB) {
-	return FileBackupAgentImpl::restore(this, cx, cxOrig, tagName, url, ranges, waitForComplete, targetVersion, verbose, addPrefix, removePrefix, lockDB, deterministicRandom()->randomUniqueID());
+Future<Version> FileBackupAgent::restore(Database cx, Optional<Database> cxOrig, Key tagName, Key url,
+                                         Standalone<VectorRef<KeyRangeRef>> ranges, bool waitForComplete,
+                                         Version targetVersion, bool verbose, Key addPrefix, Key removePrefix,
+                                         bool incrementalBackupOnly, bool lockDB) {
+	return FileBackupAgentImpl::restore(this, cx, cxOrig, tagName, url, ranges, waitForComplete, targetVersion, verbose,
+	                                    addPrefix, removePrefix, incrementalBackupOnly, lockDB,
+	                                    deterministicRandom()->randomUniqueID());
 }
 
 Future<Version> FileBackupAgent::atomicRestore(Database cx, Key tagName, Standalone<VectorRef<KeyRangeRef>> ranges, Key addPrefix, Key removePrefix) {
