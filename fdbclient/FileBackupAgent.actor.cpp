@@ -139,6 +139,9 @@ public:
 	KeyBackedProperty<Key> batchFuture() {
 		return configSpace.pack(LiteralStringRef(__FUNCTION__));
 	}
+	KeyBackedProperty<Version> beginVersion() {
+		return configSpace.pack(LiteralStringRef(__FUNCTION__));
+	}
 	KeyBackedProperty<Version> restoreVersion() {
 		return configSpace.pack(LiteralStringRef(__FUNCTION__));
 	}
@@ -3324,6 +3327,7 @@ namespace fileBackup {
 			state Reference<ReadYourWritesTransaction> tr(new ReadYourWritesTransaction(cx));
 			state RestoreConfig restore(task);
 			state Version restoreVersion;
+			state Version beginVersion;
 			state Reference<IBackupContainer> bc;
 
 			loop {
@@ -3334,6 +3338,8 @@ namespace fileBackup {
 					wait(checkTaskVersion(tr->getDatabase(), task, name, version));
 					Version _restoreVersion = wait(restore.restoreVersion().getOrThrow(tr));
 					restoreVersion = _restoreVersion;
+					Version _beginVersion = wait(restore.beginVersion().getOrThrow(tr));
+					beginVersion = _beginVersion;
 					wait(taskBucket->keepRunning(tr, task));
 
 					ERestoreState oldState = wait(restore.stateEnum().getD(tr));
@@ -3373,23 +3379,20 @@ namespace fileBackup {
 					wait(tr->onError(e));
 				}
 			}
-			state Future<Optional<bool>> logsOnly = restore.incrementalBackupOnly().get(tr);
-			wait(success(logsOnly));
-			state bool incremental = false;
-			if (logsOnly.isReady() && logsOnly.get().present() && logsOnly.get().get()) {
-				incremental = true;
+			state bool incremental = wait(restore.incrementalBackupOnly().getOrThrow(tr));
+			if (beginVersion == invalidVersion) {
+				beginVersion = 0;
 			}
-			Optional<RestorableFileSet> restorable = wait(bc->getRestoreSet(restoreVersion, incremental));
-			state Version beginVer = 0;
+			Optional<RestorableFileSet> restorable = wait(bc->getRestoreSet(restoreVersion, incremental, beginVersion));
 			if (!incremental) {
-				beginVer = restorable.get().snapshot.beginVersion;
+				beginVersion = restorable.get().snapshot.beginVersion;
 			}
 
 			if(!restorable.present())
 				throw restore_missing_data();
 
 			// First version for which log data should be applied
-			Params.firstVersion().set(task, beginVer);
+			Params.firstVersion().set(task, beginVersion);
 
 			// Convert the two lists in restorable (logs and ranges) to a single list of RestoreFiles.
 			// Order does not matter, they will be put in order when written to the restoreFileMap below.
@@ -3683,7 +3686,7 @@ public:
 	ACTOR static Future<Void> submitRestore(FileBackupAgent* backupAgent, Reference<ReadYourWritesTransaction> tr,
 	                                        Key tagName, Key backupURL, Standalone<VectorRef<KeyRangeRef>> ranges,
 	                                        Version restoreVersion, Key addPrefix, Key removePrefix, bool lockDB,
-	                                        bool incrementalBackupOnly, UID uid) {
+	                                        bool incrementalBackupOnly, Version beginVersion, UID uid) {
 		KeyRangeMap<int> restoreRangeSet;
 		for (auto& range : ranges) {
 			restoreRangeSet.insert(range, 1);
@@ -3749,6 +3752,7 @@ public:
 		restore.stateEnum().set(tr, ERestoreState::QUEUED);
 		restore.restoreVersion().set(tr, restoreVersion);
 		restore.incrementalBackupOnly().set(tr, incrementalBackupOnly);
+		restore.beginVersion().set(tr, beginVersion);
 		if (BUGGIFY && restoreRanges.size() == 1) {
 			restore.restoreRange().set(tr, restoreRanges[0]);
 		}
@@ -4241,7 +4245,8 @@ public:
 	ACTOR static Future<Version> restore(FileBackupAgent* backupAgent, Database cx, Optional<Database> cxOrig,
 	                                     Key tagName, Key url, Standalone<VectorRef<KeyRangeRef>> ranges,
 	                                     bool waitForComplete, Version targetVersion, bool verbose, Key addPrefix,
-	                                     Key removePrefix, bool lockDB, bool incrementalBackupOnly, UID randomUid) {
+	                                     Key removePrefix, bool lockDB, bool incrementalBackupOnly,
+	                                     Version beginVersion, UID randomUid) {
 		state Reference<IBackupContainer> bc = IBackupContainer::openContainer(url.toString());
 
 		state BackupDescription desc = wait(bc->describeBackup());
@@ -4257,7 +4262,8 @@ public:
 			targetVersion = desc.contiguousLogEnd.get() - 1;
 		}
 
-		Optional<RestorableFileSet> restoreSet = wait(bc->getRestoreSet(targetVersion, incrementalBackupOnly));
+		Optional<RestorableFileSet> restoreSet =
+		    wait(bc->getRestoreSet(targetVersion, incrementalBackupOnly, beginVersion));
 
 		if(!restoreSet.present()) {
 			TraceEvent(SevWarn, "FileBackupAgentRestoreNotPossible")
@@ -4277,7 +4283,7 @@ public:
 				tr->setOption(FDBTransactionOptions::ACCESS_SYSTEM_KEYS);
 				tr->setOption(FDBTransactionOptions::LOCK_AWARE);
 				wait(submitRestore(backupAgent, tr, tagName, url, ranges, targetVersion, addPrefix, removePrefix,
-				                   lockDB, incrementalBackupOnly, randomUid));
+				                   lockDB, incrementalBackupOnly, beginVersion, randomUid));
 				wait(tr->commit());
 				break;
 			} catch(Error &e) {
@@ -4394,7 +4400,7 @@ public:
 		Reference<IBackupContainer> bc = wait(backupConfig.backupContainer().getOrThrow(cx));
 
 		TraceEvent("AS_StartRestore");
-		Version ver = wait( restore(backupAgent, cx, cx, tagName, KeyRef(bc->getURL()), ranges, true, -1, true, addPrefix, removePrefix, true, false, randomUid) );
+		Version ver = wait( restore(backupAgent, cx, cx, tagName, KeyRef(bc->getURL()), ranges, true, -1, true, addPrefix, removePrefix, true, false, invalidVersion, randomUid) );
 		return ver;
 	}
 };
@@ -4406,9 +4412,9 @@ const int FileBackupAgent::dataFooterSize = 20;
 Future<Version> FileBackupAgent::restore(Database cx, Optional<Database> cxOrig, Key tagName, Key url,
                                          Standalone<VectorRef<KeyRangeRef>> ranges, bool waitForComplete,
                                          Version targetVersion, bool verbose, Key addPrefix, Key removePrefix,
-                                         bool lockDB, bool incrementalBackupOnly) {
+                                         bool lockDB, bool incrementalBackupOnly, Version beginVersion) {
 	return FileBackupAgentImpl::restore(this, cx, cxOrig, tagName, url, ranges, waitForComplete, targetVersion, verbose,
-	                                    addPrefix, removePrefix, lockDB, incrementalBackupOnly,
+	                                    addPrefix, removePrefix, lockDB, incrementalBackupOnly, beginVersion,
 	                                    deterministicRandom()->randomUniqueID());
 }
 
