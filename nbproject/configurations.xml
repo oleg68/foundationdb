@@ -701,7 +701,7 @@
         <cTool flags="2">
         </cTool>
       </item>
-      <item path="bindings/c/test/mako/zipf.c" ex="false" tool="0" flavor2="2">
+      <item path="bindings/c/test/mako/zipf.c" ex="false" tool="0" flavor2="3">
         <cTool flags="2">
         </cTool>
       </item>
@@ -6505,23 +6505,20 @@
       <folder path="0/fdbmonitor">
         <ccTool>
           <incDir>
+            <pElem>fdbmonitor</pElem>
+            <pElem>/usr/include/c++/10/bits</pElem>
+            <pElem>/usr/include/c++/10</pElem>
+            <pElem>/usr/include/c++/10/ext</pElem>
+            <pElem>flow</pElem>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+            <pElem>/usr/include/c++/10/x86_64-redhat-linux/bits</pElem>
+            <pElem>/usr/include/c++/10/debug</pElem>
+            <pElem>/usr/include/c++/10/tr1</pElem>
+            <pElem>/usr/include/c++/10/pstl</pElem>
             <pElem>.</pElem>
-            <pElem>bld</pElem>
-            <pElem>bld/fdbclient</pElem>
+            <pElem>/usr/include/c++/10/x86_64-redhat-linux</pElem>
             <pElem>bld/fdbmonitor</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
-            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
-            <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
-            <Elem>HAVE_OPENSSL</Elem>
-            <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
-            <Elem>NDEBUG</Elem>
-            <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
-          </preprocessorList>
         </ccTool>
       </folder>
       <folder path="0/fdbrpc">
@@ -6543,6 +6540,21 @@
             <Elem>NO_INTELLISENSE</Elem>
             <Elem>USE_UCONTEXT</Elem>
           </preprocessorList>
+        </cTool>
+      </folder>
+      <folder path="0/fdbrpc/libeio">
+        <cTool>
+          <incDir>
+            <pElem>fdbrpc/libeio</pElem>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <folder path="0/fdbrpc/zlib">
+        <cTool>
+          <incDir>
+            <pElem>fdbrpc/zlib</pElem>
+          </incDir>
         </cTool>
       </folder>
       <folder path="0/flow">
@@ -6572,22 +6584,17 @@
       <folder path="0/monitoring">
         <ccTool>
           <incDir>
-            <pElem>.</pElem>
-            <pElem>bld</pElem>
+            <pElem>/usr/include/c++/10/bits</pElem>
+            <pElem>/usr/include/c++/10/ext</pElem>
+            <pElem>/usr/include/c++/10</pElem>
+            <pElem>monitoring</pElem>
+            <pElem>/usr/include/c++/10/x86_64-redhat-linux/bits</pElem>
+            <pElem>/usr/include/c++/10/debug</pElem>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+            <pElem>/usr/include/c++/10/pstl</pElem>
+            <pElem>/usr/include/c++/10/x86_64-redhat-linux</pElem>
             <pElem>bld/monitoring</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
-            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
-            <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
-            <Elem>HAVE_OPENSSL</Elem>
-            <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
-            <Elem>NDEBUG</Elem>
-            <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
-          </preprocessorList>
         </ccTool>
       </folder>
       <folder path="Modules">
@@ -6998,7 +7005,7 @@
         </cTool>
       </item>
       <item path="fdbmonitor/fdbmonitor.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="fdbrpc/ActorFuzz.actor.cpp" ex="false" tool="1" flavor2="11">
@@ -7315,19 +7322,28 @@
         </ccTool>
       </item>
       <item path="fdbrpc/libcoroutine/Common.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>fdbrpc/libcoroutine</pElem>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/libcoroutine/Coro.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>fdbrpc/libcoroutine</pElem>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+            <pElem>flow</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/libcoroutine/context.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
         </cTool>
       </item>
       <item path="fdbrpc/libeio/eio.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
         </cTool>
       </item>
       <item path="fdbrpc/sim2.actor.cpp" ex="false" tool="1" flavor2="11">
@@ -7362,55 +7378,79 @@
         </ccTool>
       </item>
       <item path="fdbrpc/zlib/adler32.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
         </cTool>
       </item>
       <item path="fdbrpc/zlib/crc32.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/zlib/deflate.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/zlib/gzclose.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
         </cTool>
       </item>
       <item path="fdbrpc/zlib/gzlib.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/zlib/gzread.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/zlib/gzwrite.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/zlib/infback.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/zlib/inffast.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
         </cTool>
       </item>
       <item path="fdbrpc/zlib/inflate.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbrpc/zlib/inftrees.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
         </cTool>
       </item>
       <item path="fdbrpc/zlib/trees.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
         </cTool>
       </item>
       <item path="fdbrpc/zlib/zutil.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
+          <incDir>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="fdbserver/ApplyMetadataMutation.cpp"
@@ -7837,24 +7877,12 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="2">
+        <cTool flags="4">
           <incDir>
-            <pElem>.</pElem>
-            <pElem>bld</pElem>
+            <pElem>fdbserver/sqlite</pElem>
+            <pElem>/usr/lib/gcc/x86_64-redhat-linux/10/include</pElem>
             <pElem>bld/fdbserver</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
-            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
-            <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
-            <Elem>HAVE_OPENSSL</Elem>
-            <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
-            <Elem>NDEBUG</Elem>
-            <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
-          </preprocessorList>
         </cTool>
       </item>
       <item path="fdbserver/storageserver.actor.cpp" ex="false" tool="1" flavor2="11">
@@ -9303,31 +9331,15 @@
         </ccTool>
       </item>
       <item path="flow/version.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="3">
           <incDir>
-            <pElem>.</pElem>
-            <pElem>bld</pElem>
             <pElem>flow</pElem>
             <pElem>bld/flow</pElem>
-            <pElem>flow/-lpthread</pElem>
-            <pElem>bld/boostProject-prefix/src/boostProject</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>BOOST_ERROR_CODE_HEADER_ONLY</Elem>
-            <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
-            <Elem>CMAKE_BUILD</Elem>
-            <Elem>DTRACE_PROBES</Elem>
-            <Elem>HAS_ALIGNED_ALLOC</Elem>
-            <Elem>HAVE_OPENSSL</Elem>
-            <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
-            <Elem>NDEBUG</Elem>
-            <Elem>NO_INTELLISENSE</Elem>
-            <Elem>USE_UCONTEXT</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="monitoring/actor_flamegraph.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool flags="3">
         </ccTool>
       </item>
     </conf>
