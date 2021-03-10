@@ -623,44 +623,6 @@ CSimpleOpt::SOption g_rgBackupListOptions[] = {
 
 CSimpleOpt::SOption g_rgRestoreOptions[] = {
 #ifdef _WIN32
-<<<<<<< HEAD
-	{ OPT_PARENTPID,      "--parentpid",       SO_REQ_SEP },
-#endif
-	{ OPT_RESTORE_CLUSTERFILE_DEST,     "--dest_cluster_file", SO_REQ_SEP },
-	{ OPT_RESTORE_CLUSTERFILE_ORIG,     "--orig_cluster_file", SO_REQ_SEP },
-	{ OPT_RESTORE_TIMESTAMP,            "--timestamp",         SO_REQ_SEP },
-	{ OPT_KNOB,            "--knob_",          SO_REQ_SEP },
-	{ OPT_RESTORECONTAINER,"-r",               SO_REQ_SEP },
-	{ OPT_PREFIX_ADD,      "-add_prefix",      SO_REQ_SEP },  // TODO:  Remove in 6.3
-	{ OPT_PREFIX_ADD,      "--add_prefix",     SO_REQ_SEP },
-	{ OPT_PREFIX_REMOVE,   "-remove_prefix",   SO_REQ_SEP },  // TODO:  Remove in 6.3
-	{ OPT_PREFIX_REMOVE,   "--remove_prefix",  SO_REQ_SEP },
-	{ OPT_TAGNAME,         "-t",               SO_REQ_SEP },
-	{ OPT_TAGNAME,         "--tagname",        SO_REQ_SEP },
-	{ OPT_BACKUPKEYS,      "-k",               SO_REQ_SEP },
-	{ OPT_BACKUPKEYS,      "--keys",           SO_REQ_SEP },
-	{ OPT_WAITFORDONE,     "-w",               SO_NONE },
-	{ OPT_WAITFORDONE,     "--waitfordone",    SO_NONE },
-	{ OPT_RESTORE_BEGIN_VERSION, "--begin_version", SO_REQ_SEP },
-	{ OPT_RESTORE_VERSION, "--version",        SO_REQ_SEP },
-	{ OPT_RESTORE_VERSION, "-v",               SO_REQ_SEP },
-	{ OPT_TRACE,           "--log",            SO_NONE },
-	{ OPT_TRACE_DIR,       "--logdir",         SO_REQ_SEP },
-	{ OPT_TRACE_FORMAT,    "--trace_format",   SO_REQ_SEP },
-	{ OPT_TRACE_LOG_GROUP, "--loggroup",       SO_REQ_SEP },
-	{ OPT_QUIET,           "-q",               SO_NONE },
-	{ OPT_QUIET,           "--quiet",          SO_NONE },
-	{ OPT_DRYRUN,          "-n",               SO_NONE },
-	{ OPT_DRYRUN,          "--dryrun",         SO_NONE },
-	{ OPT_FORCE,           "-f",               SO_NONE },
-	{ OPT_CRASHONERROR,    "--crash",          SO_NONE },
-	{ OPT_MEMLIMIT,        "-m",               SO_REQ_SEP },
-	{ OPT_MEMLIMIT,        "--memory",         SO_REQ_SEP },
-	{ OPT_HELP,            "-?",               SO_NONE },
-	{ OPT_HELP,            "-h",               SO_NONE },
-	{ OPT_HELP,            "--help",           SO_NONE },
-	{ OPT_DEVHELP,         "--dev-help",       SO_NONE },
-=======
 	{ OPT_PARENTPID, "--parentpid", SO_REQ_SEP },
 #endif
 	{ OPT_RESTORE_CLUSTERFILE_DEST, "--dest_cluster_file", SO_REQ_SEP },
@@ -697,7 +659,6 @@ CSimpleOpt::SOption g_rgRestoreOptions[] = {
 	{ OPT_HELP, "-h", SO_NONE },
 	{ OPT_HELP, "--help", SO_NONE },
 	{ OPT_DEVHELP, "--dev-help", SO_NONE },
->>>>>>> os-62-increstore
 	{ OPT_BLOB_CREDENTIALS, "--blob_credentials", SO_REQ_SEP },
 	{ OPT_INCREMENTALONLY,  "--incremental",    SO_NONE },
 #ifndef TLS_DISABLED
@@ -1126,13 +1087,8 @@ static void printRestoreUsage(bool devhelp) {
 	       "                 Sets the LogGroup field with the specified value for all\n"
 	       "                 events in the trace output (defaults to `default').\n");
 	printf("  --trace_format FORMAT\n"
-<<<<<<< HEAD
-		   "                 Select the format of the trace files. xml (the default) and json are supported.\n"
-		   "                 Has no effect unless --log is specified.\n");
-=======
 	       "                 Select the format of the trace files. xml (the default) and json are supported.\n"
 	       "                 Has no effect unless --log is specified.\n");
->>>>>>> os-62-increstore
 	printf("  --incremental\n"
 	       "                 Performs incremental restore without the base backup.\n");
 #ifndef TLS_DISABLED
@@ -3162,68 +3118,6 @@ int main(int argc, char* argv[]) {
 					}
 					break;
 				}
-<<<<<<< HEAD
-				case OPT_MOD_VERIFY_UID:
-					modifyOptions.verifyUID = args->OptionArg();
-					break;
-				case OPT_WAITFORDONE:
-					waitForDone = true;
-					break;
-				case OPT_NOSTOPWHENDONE:
-					stopWhenDone = false;
-					break;
-				case OPT_INCREMENTALONLY:
-					incrementalBackupOnly = true;
-					break;
-				case OPT_RESTORECONTAINER:
-					restoreContainer = args->OptionArg();
-					// If the url starts with '/' then prepend "file://" for backwards compatibility
-					if(StringRef(restoreContainer).startsWith(LiteralStringRef("/")))
-						restoreContainer = std::string("file://") + restoreContainer;
-					break;
-				case OPT_DESCRIBE_DEEP:
-					describeDeep = true;
-					break;
-				case OPT_DESCRIBE_TIMESTAMPS:
-					describeTimestamps = true;
-					break;
-				case OPT_PREFIX_ADD:
-					addPrefix = args->OptionArg();
-					break;
-				case OPT_PREFIX_REMOVE:
-					removePrefix = args->OptionArg();
-					break;
-				case OPT_ERRORLIMIT: {
-					const char* a = args->OptionArg();
-					if (!sscanf(a, "%d", &maxErrors)) {
-						fprintf(stderr, "ERROR: Could not parse max number of errors `%s'\n", a);
-						printHelpTeaser(argv[0]);
-						return FDB_EXIT_ERROR;
-					}
-					break;
-				}
-				case OPT_RESTORE_BEGIN_VERSION: {
-					const char* a = args->OptionArg();
-					long long ver = 0;
-					if (!sscanf(a, "%lld", &ver)) {
-						fprintf(stderr, "ERROR: Could not parse database beginVersion `%s'\n", a);
-						printHelpTeaser(argv[0]);
-						return FDB_EXIT_ERROR;
-					}
-					beginVersion = ver;
-					break;
-				}
-				case OPT_RESTORE_VERSION: {
-					const char* a = args->OptionArg();
-					long long ver = 0;
-					if (!sscanf(a, "%lld", &ver)) {
-						fprintf(stderr, "ERROR: Could not parse database version `%s'\n", a);
-						printHelpTeaser(argv[0]);
-						return FDB_EXIT_ERROR;
-					}
-					restoreVersion = ver;
-					break;
-=======
 			case OPT_MOD_VERIFY_UID:
 				modifyOptions.verifyUID = args->OptionArg();
 				break;
@@ -3270,7 +3164,6 @@ int main(int argc, char* argv[]) {
 					fprintf(stderr, "ERROR: Could not parse database beginVersion `%s'\n", a);
 					printHelpTeaser(argv[0]);
 					return FDB_EXIT_ERROR;
->>>>>>> os-62-increstore
 				}
 				beginVersion = ver;
 				break;
