@@ -1180,6 +1180,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -1208,6 +1210,10 @@
             tool="1"
             flavor2="11">
         <ccTool flags="1">
+          <preprocessorList>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbclient/BackupContainer.actor.g.cpp"
@@ -1215,6 +1221,10 @@
             tool="1"
             flavor2="11">
         <ccTool flags="1">
+          <preprocessorList>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbclient/BlobStore.actor.g.cpp"
@@ -1229,6 +1239,10 @@
             tool="1"
             flavor2="11">
         <ccTool flags="1">
+          <preprocessorList>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbclient/FDBOptions.g.cpp" ex="false" tool="1" flavor2="11">
@@ -1247,6 +1261,10 @@
             tool="1"
             flavor2="11">
         <ccTool flags="1">
+          <preprocessorList>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="bld/fdbclient/HTTP.actor.g.cpp" ex="false" tool="1" flavor2="11">
@@ -1934,6 +1952,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -2018,6 +2038,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -2861,6 +2883,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -3143,6 +3167,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -3498,6 +3524,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -3526,6 +3554,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -3662,6 +3692,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -3690,6 +3722,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -3718,6 +3752,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -3746,6 +3782,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -4362,6 +4400,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -5963,6 +6003,8 @@
           </incDir>
           <preprocessorList>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
           </preprocessorList>
@@ -7481,6 +7523,8 @@
             <Elem>BOOST_SYSTEM_NO_DEPRECATED</Elem>
             <Elem>CMAKE_BUILD</Elem>
             <Elem>DTRACE_PROBES</Elem>
+            <Elem>FDB_CLEAN_BUILD</Elem>
+            <Elem>FDB_RELEASE</Elem>
             <Elem>HAS_ALIGNED_ALLOC</Elem>
             <Elem>HAVE_OPENSSL</Elem>
             <Elem>HAVE_OPENSSL_INIT_NO_ATEXIT</Elem>
