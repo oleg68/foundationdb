@@ -136,7 +136,7 @@ public:
 	}
 	KeyBackedProperty<Key> addPrefix() { return configSpace.pack(LiteralStringRef(__FUNCTION__)); }
 	KeyBackedProperty<Key> removePrefix() { return configSpace.pack(LiteralStringRef(__FUNCTION__)); }
-	KeyBackedProperty<bool> incrementalBackupOnly() { return configSpace.pack(LiteralStringRef(__FUNCTION__)); }
+	KeyBackedProperty<bool> onlyAppyMutationLogs() { return configSpace.pack(LiteralStringRef(__FUNCTION__)); }
 	KeyBackedProperty<bool> inconsistentSnapshotOnly() { return configSpace.pack(LiteralStringRef(__FUNCTION__)); }
 	// XXX: Remove restoreRange() once it is safe to remove. It has been changed to restoreRanges
 	KeyBackedProperty<KeyRange> restoreRange() { return configSpace.pack(LiteralStringRef(__FUNCTION__)); }
@@ -3393,9 +3393,9 @@ struct RestoreDispatchTaskFunc : RestoreTaskFuncBase {
 		state int64_t remainingInBatch = Params.remainingInBatch().get(task);
 		state bool addingToExistingBatch = remainingInBatch > 0;
 		state Version restoreVersion;
-		state Future<Optional<bool>> incrementalBackupOnly = restore.incrementalBackupOnly().get(tr);
+		state Future<Optional<bool>> onlyAppyMutationLogs = restore.onlyAppyMutationLogs().get(tr);
 
-		wait(store(restoreVersion, restore.restoreVersion().getOrThrow(tr)) && success(incrementalBackupOnly) &&
+		wait(store(restoreVersion, restore.restoreVersion().getOrThrow(tr)) && success(onlyAppyMutationLogs) &&
 		     checkTaskVersion(tr->getDatabase(), task, name, version));
 
 		// If not adding to an existing batch then update the apply mutations end version so the mutations from the
@@ -3870,7 +3870,6 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 		state Version beginVersion;
 		state Reference<IBackupContainer> bc;
 		state std::vector<KeyRange> ranges;
-		state bool incremental;
 		state bool inconsistentSnapshotOnly;
 
 		loop {
@@ -3882,7 +3881,6 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 				wait(checkTaskVersion(tr->getDatabase(), task, name, version));
 				wait(store(restoreVersion, restore.restoreVersion().getOrThrow(tr)));
 				wait(store(ranges, restore.getRestoreRangesOrDefault(tr)));
-				wait(store(incremental, restore.incrementalBackupOnly().getOrThrow(tr)));
 				wait(store(inconsistentSnapshotOnly,
 				           restore.inconsistentSnapshotOnly().getD(tr, false, CLIENT_KNOBS->RESTORE_IGNORE_LOG_FILES)));
 
@@ -3931,6 +3929,7 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 		}
 
 		state Version firstConsistentVersion = invalidVersion;
+		state bool logsOnly = wait(restore.onlyAppyMutationLogs().getD(tr, false, false));
 		if (beginVersion == invalidVersion) {
 			beginVersion = 0;
 		}
@@ -3938,14 +3937,14 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 		for (auto const& r : ranges) {
 			keyRangesFilter.push_back_deep(keyRangesFilter.arena(), KeyRangeRef(r));
 		}
-		state Optional<RestorableFileSet> restorable = wait(bc->getRestoreSet(restoreVersion, keyRangesFilter));
+		state Optional<RestorableFileSet> restorable =
+		    wait(bc->getRestoreSet(restoreVersion, keyRangesFilter, logsOnly, beginVersion));
+		if (!logsOnly) {
+			beginVersion = restorable.get().snapshot.beginVersion;
+		}
 
 		if (!restorable.present())
 			throw restore_missing_data();
-
-		if (!incremental) {
-			beginVersion = restorable.get().snapshot.beginVersion;
-		}
 
 		// First version for which log data should be applied
 		Params.firstVersion().set(task, beginVersion);
@@ -4063,7 +4062,7 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 		    tr, taskBucket, task, 0, "", 0, CLIENT_KNOBS->RESTORE_DISPATCH_BATCH_SIZE)));
 
 		wait(taskBucket->finish(tr, task));
-		state Future<Optional<bool>> logsOnly = restore.incrementalBackupOnly().get(tr);
+		state Future<Optional<bool>> logsOnly = restore.onlyAppyMutationLogs().get(tr);
 		wait(success(logsOnly));
 		if (logsOnly.get().present() && logsOnly.get().get()) {
 			// If this is an incremental restore, we need to set the applyMutationsMapPrefix
@@ -4460,7 +4459,7 @@ public:
 	                                        Key addPrefix,
 	                                        Key removePrefix,
 	                                        bool lockDB,
-	                                        bool incrementalBackupOnly,
+	                                        bool onlyAppyMutationLogs,
 	                                        bool inconsistentSnapshotOnly,
 	                                        Version beginVersion,
 	                                        UID uid) {
@@ -4513,7 +4512,7 @@ public:
 			                                .removePrefix(removePrefix)
 			                                .withPrefix(addPrefix);
 			Standalone<RangeResultRef> existingRows = wait(tr->getRange(restoreIntoRange, 1));
-			if (existingRows.size() > 0 && !incrementalBackupOnly) {
+			if (existingRows.size() > 0 && !onlyAppyMutationLogs) {
 				throw restore_destination_not_empty();
 			}
 		}
@@ -4530,7 +4529,7 @@ public:
 		restore.sourceContainer().set(tr, bc);
 		restore.stateEnum().set(tr, ERestoreState::QUEUED);
 		restore.restoreVersion().set(tr, restoreVersion);
-		restore.incrementalBackupOnly().set(tr, incrementalBackupOnly);
+		restore.onlyAppyMutationLogs().set(tr, onlyAppyMutationLogs);
 		restore.inconsistentSnapshotOnly().set(tr, inconsistentSnapshotOnly);
 		restore.beginVersion().set(tr, beginVersion);
 		if (BUGGIFY && restoreRanges.size() == 1) {
@@ -5103,6 +5102,7 @@ public:
 	//   removePrefix: for each key to be restored, remove this prefix first.
 	//   lockDB: if set lock the database with randomUid before performing restore;
 	//           otherwise, check database is locked with the randomUid
+	//   onlyAppyMutationLogs: only perform incremental restore, by only applying mutation logs
 	//   inconsistentSnapshotOnly: Ignore mutation log files during the restore to speedup the process.
 	//                             When set to true, gives an inconsistent snapshot, thus not recommended
 	//   randomUid: the UID for lock the database
@@ -5118,7 +5118,7 @@ public:
 	                                     Key addPrefix,
 	                                     Key removePrefix,
 	                                     bool lockDB,
-	                                     bool incrementalBackupOnly,
+	                                     bool onlyAppyMutationLogs,
 	                                     bool inconsistentSnapshotOnly,
 	                                     Version beginVersion,
 	                                     UID randomUid) {
@@ -5138,12 +5138,12 @@ public:
 		if (targetVersion == invalidVersion && desc.maxRestorableVersion.present())
 			targetVersion = desc.maxRestorableVersion.get();
 
-		if (targetVersion == invalidVersion && incrementalBackupOnly && desc.contiguousLogEnd.present()) {
+		if (targetVersion == invalidVersion && onlyAppyMutationLogs && desc.contiguousLogEnd.present()) {
 			targetVersion = desc.contiguousLogEnd.get() - 1;
 		}
 
 		Optional<RestorableFileSet> restoreSet =
-		    wait(bc->getRestoreSet(targetVersion, {}, incrementalBackupOnly, beginVersion));
+		    wait(bc->getRestoreSet(targetVersion, ranges, onlyAppyMutationLogs, beginVersion));
 
 		if (!restoreSet.present()) {
 			TraceEvent(SevWarn, "FileBackupAgentRestoreNotPossible")
@@ -5174,7 +5174,7 @@ public:
 				                   addPrefix,
 				                   removePrefix,
 				                   lockDB,
-				                   incrementalBackupOnly,
+				                   onlyAppyMutationLogs,
 				                   inconsistentSnapshotOnly,
 				                   beginVersion,
 				                   randomUid));
@@ -5392,7 +5392,7 @@ Future<Version> FileBackupAgent::restore(Database cx,
                                          Key addPrefix,
                                          Key removePrefix,
                                          bool lockDB,
-                                         bool incrementalBackupOnly,
+                                         bool onlyAppyMutationLogs,
                                          bool inconsistentSnapshotOnly,
                                          Version beginVersion) {
 	return FileBackupAgentImpl::restore(this,
@@ -5407,7 +5407,7 @@ Future<Version> FileBackupAgent::restore(Database cx,
 	                                    addPrefix,
 	                                    removePrefix,
 	                                    lockDB,
-	                                    incrementalBackupOnly,
+	                                    onlyAppyMutationLogs,
 	                                    inconsistentSnapshotOnly,
 	                                    beginVersion,
 	                                    deterministicRandom()->randomUniqueID());

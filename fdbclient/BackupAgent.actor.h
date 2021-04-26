@@ -299,7 +299,7 @@ public:
 	                        Key addPrefix = Key(),
 	                        Key removePrefix = Key(),
 	                        bool lockDB = true,
-	                        bool incrementalBackupOnly = false,
+	                        bool onlyAppyMutationLogs = false,
 	                        bool inconsistentSnapshotOnly = false,
 	                        Version beginVersion = -1);
 	Future<Version> restore(Database cx,
@@ -313,7 +313,7 @@ public:
 	                        Key addPrefix = Key(),
 	                        Key removePrefix = Key(),
 	                        bool lockDB = true,
-	                        bool incrementalBackupOnly = false,
+	                        bool onlyAppyMutationLogs = false,
 	                        bool inconsistentSnapshotOnly = false,
 	                        Version beginVersion = -1) {
 		Standalone<VectorRef<KeyRangeRef>> rangeRef;
@@ -329,7 +329,7 @@ public:
 		               addPrefix,
 		               removePrefix,
 		               lockDB,
-		               incrementalBackupOnly,
+		               onlyAppyMutationLogs,
 		               inconsistentSnapshotOnly,
 		               beginVersion);
 	}
