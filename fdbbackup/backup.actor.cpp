@@ -2325,7 +2325,10 @@ ACTOR Future<Void> runRestore(Database db,
 			                                                   verbose,
 			                                                   KeyRef(addPrefix),
 			                                                   KeyRef(removePrefix),
-			                                                   inconsistentSnapshotOnly));
+			                                                   true,
+			                                                   incrementalBackupOnly,
+			                                                   inconsistentSnapshotOnly,
+			                                                   beginVersion));
 
 			if (waitForDone && verbose) {
 				// If restore is now complete then report version restored
