@@ -4203,6 +4203,8 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 					txBytes += fileSet.insert(tr, *i);
 					nFileBlocks += (i->fileSize + i->blockSize - 1) / i->blockSize;
 					++nFiles;
+                                        TraceEvent("FileRestoreLoadFile")
+                                            .detail("FileName", i->fileName);
 				}
 
 				restore.fileCount().atomicOp(tr, nFiles, MutationRef::Type::AddValue);
