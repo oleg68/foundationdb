@@ -3870,6 +3870,7 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 		state Version beginVersion;
 		state Reference<IBackupContainer> bc;
 		state std::vector<KeyRange> ranges;
+		state bool logsOnly;
 		state bool inconsistentSnapshotOnly;
 
 		loop {
@@ -3877,12 +3878,13 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 				tr->setOption(FDBTransactionOptions::ACCESS_SYSTEM_KEYS);
 				tr->setOption(FDBTransactionOptions::LOCK_AWARE);
 
-				wait(store(beginVersion, restore.beginVersion().getD(tr, false, invalidVersion)));
 				wait(checkTaskVersion(tr->getDatabase(), task, name, version));
+				wait(store(beginVersion, restore.beginVersion().getD(tr, false, invalidVersion)));
+
 				wait(store(restoreVersion, restore.restoreVersion().getOrThrow(tr)));
 				wait(store(ranges, restore.getRestoreRangesOrDefault(tr)));
-				wait(store(inconsistentSnapshotOnly,
-				           restore.inconsistentSnapshotOnly().getD(tr, false, CLIENT_KNOBS->RESTORE_IGNORE_LOG_FILES)));
+				wait(store(logsOnly, restore.onlyAppyMutationLogs().getD(tr, false, false)));
+				wait(store(inconsistentSnapshotOnly, restore.inconsistentSnapshotOnly().getD(tr, false, false)));
 
 				wait(taskBucket->keepRunning(tr, task));
 
@@ -3929,7 +3931,6 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 		}
 
 		state Version firstConsistentVersion = invalidVersion;
-		state bool logsOnly = wait(restore.onlyAppyMutationLogs().getD(tr, false, false));
 		if (beginVersion == invalidVersion) {
 			beginVersion = 0;
 		}
@@ -3939,42 +3940,45 @@ struct StartFullRestoreTaskFunc : RestoreTaskFuncBase {
 		}
 		state Optional<RestorableFileSet> restorable =
 		    wait(bc->getRestoreSet(restoreVersion, keyRangesFilter, logsOnly, beginVersion));
-		if (!logsOnly) {
-			beginVersion = restorable.get().snapshot.beginVersion;
-		}
-
 		if (!restorable.present())
 			throw restore_missing_data();
-
-		// First version for which log data should be applied
-		Params.firstVersion().set(task, beginVersion);
 
 		// Convert the two lists in restorable (logs and ranges) to a single list of RestoreFiles.
 		// Order does not matter, they will be put in order when written to the restoreFileMap below.
 		state std::vector<RestoreConfig::RestoreFile> files;
-		if (!inconsistentSnapshotOnly) {
-			for (const RangeFile& f : restorable.get().ranges) {
-				files.push_back({ f.version, f.fileName, true, f.blockSize, f.fileSize });
-				// In a restore with both snapshots and logs, the firstConsistentVersion is the highest version of
-				// any range file.
-				firstConsistentVersion = std::max(firstConsistentVersion, f.version);
+		if (!logsOnly) {
+			beginVersion = restorable.get().snapshot.beginVersion;
+			if (!inconsistentSnapshotOnly) {
+				for (const RangeFile& f : restorable.get().ranges) {
+					files.push_back({ f.version, f.fileName, true, f.blockSize, f.fileSize });
+					// In a restore with both snapshots and logs, the firstConsistentVersion is the highest version of
+					// any range file.
+					firstConsistentVersion = std::max(firstConsistentVersion, f.version);
+				}
+			} else {
+				for (int i = 0; i < restorable.get().ranges.size(); ++i) {
+					const RangeFile& f = restorable.get().ranges[i];
+					files.push_back({ f.version, f.fileName, true, f.blockSize, f.fileSize });
+					// In inconsistentSnapshotOnly mode, if all range files have the same version, then it is the
+					// firstConsistentVersion, otherwise unknown (use -1).
+					if (i != 0 && f.version != firstConsistentVersion) {
+						firstConsistentVersion = invalidVersion;
+					} else {
+						firstConsistentVersion = f.version;
+					}
+				}
 			}
+		} else {
+			// In logs-only (incremental) mode, the firstConsistentVersion should just be restore.beginVersion().
+			firstConsistentVersion = beginVersion;
+		}
+		if (!inconsistentSnapshotOnly) {
 			for (const LogFile& f : restorable.get().logs) {
 				files.push_back({ f.beginVersion, f.fileName, false, f.blockSize, f.fileSize, f.endVersion });
 			}
-		} else {
-			for (int i = 0; i < restorable.get().ranges.size(); ++i) {
-				const RangeFile& f = restorable.get().ranges[i];
-				files.push_back({ f.version, f.fileName, true, f.blockSize, f.fileSize });
-				// In inconsistentSnapshotOnly mode, if all range files have the same version, then it is the
-				// firstConsistentVersion, otherwise unknown (use -1).
-				if (i != 0 && f.version != firstConsistentVersion) {
-					firstConsistentVersion = invalidVersion;
-				} else {
-					firstConsistentVersion = f.version;
-				}
-			}
 		}
+		// First version for which log data should be applied
+		Params.firstVersion().set(task, beginVersion);
 
 		tr->reset();
 		loop {
