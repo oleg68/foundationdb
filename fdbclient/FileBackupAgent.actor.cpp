@@ -5147,7 +5147,7 @@ public:
 		}
 
 		Optional<RestorableFileSet> restoreSet =
-		    wait(bc->getRestoreSet(targetVersion, ranges, onlyAppyMutationLogs, beginVersion));
+		    wait(bc->getRestoreSet(targetVersion, {}, onlyAppyMutationLogs, beginVersion));
 
 		if (!restoreSet.present()) {
 			TraceEvent(SevWarn, "FileBackupAgentRestoreNotPossible")
