@@ -3621,6 +3621,10 @@ struct RestoreDispatchTaskFunc : RestoreTaskFuncBase {
 		state RestoreConfig::FileSetT::Values files =
 		    wait(restore.fileSet().getRange(tr, { beginVersion, beginFile }, {}, taskBatchSize));
 
+                TraceEvent("FileRestoreDispatchAfterGetFiles")
+                    .detail("BeginVersion", beginVersion)
+                    .detail("BeginFile", beginFile)
+                    .detail("FilesSize", files.size());
 		// allPartsDone will be set once all block tasks in the current batch are finished.
 		state Reference<TaskFuture> allPartsDone;
 
@@ -3722,6 +3726,12 @@ struct RestoreDispatchTaskFunc : RestoreTaskFuncBase {
 
 		for (; i < files.size(); ++i) {
 			RestoreConfig::RestoreFile& f = files[i];
+
+			TraceEvent("FileRestoreDispatchingFile")
+			    .detail("RestoreUID", restore.getUid())
+			    .detail("I", i)
+			    .detail("FileName", f.fileName)
+			    .detail("TaskInstance", THIS_ADDR);
 
 			// Here we are "between versions" (prior to adding the first block of the first file of a new version) so
 			// this is an opportunity to end the current dispatch batch (which must end on a version boundary) if the
